@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Wall-E DbModel</title>
+<link href="static/module/layui/css/layui.css" rel="stylesheet">
+<link href="static/app/dbmodel/css/main.css" rel="stylesheet">
+</head>
+<body project-id="">
+  <div class="walle"></div>
+	<div class="header">
+    <form class="layui-form layui-main">
+    	<div class="layui-inline">
+			<button class="layui-btn layui-btn-primary create-model">创建model</button>
+			<button class="layui-btn layui-btn-primary mapping-model">映射model</button>
+
+    	</div>
+	  </form>
+  </div>
+  <div class="container layui-main site-inline">
+    <fieldset class="layui-elem-field layui-field-title">
+      <legend>配置</legend>
+    </fieldset>
+    <blockquote class="layui-elem-quote">
+      <div class="layui-inline">
+        <label class="layui-form-label">dbName</label>
+        <div class="layui-input-inline">
+          <input type="text" name="dbName"  value="${dbName!''}" autocomplete="off" class="layui-input" placeholder="导入sql的数据库名称">
+        </div>
+        <div class="layui-input-inline">
+          <button class="layui-btn layui-btn-danger quickGenerate">快速生成</button>
+        </div>
+      </div>
+    </blockquote>
+    <table class="layui-table" lay-even lay-skin="nob">
+      <colgroup>
+      <col width="10">
+      <col width="150">
+      <col width="500">
+      <col>
+      </colgroup>
+      <thead>
+        <tr>
+          <th></th>
+          <th>表名</th>
+          <th>描述</th>
+          <th>类名</th>
+          <th>操作</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for(model in dbmodels.list) {
+        <tr>
+          <td>${modelLP.index}</td>
+          <td>${model.name}</td>
+          <td>${model.describe}</td>
+          <td>${model.class_name}</td>
+          <td>
+            <button class="layui-btn layui-btn-small layui-btn-normal update-form" data-id="${model.id}">修改</button>
+            <button class="layui-btn layui-btn-small layui-btn-danger delete-form" data-id="${model.id}">删除</button>
+            <button class="layui-btn layui-btn-small layui-btn syn-db" data-id="${model.id}">同步到数据库</button>
+            <button class="layui-btn layui-btn-small layui-btn-warm gen-code" data-id="${model.id}">生成代码</button>
+          </td>
+        </tr>
+        @}
+      </tbody>
+    </table>
+  </div>
+  <div class="foot">
+  </div>
+</body>
+<script src="static/module/jquery/jquery-1.9.1.min.js"></script>
+<script src="static/module/layui/layui.js"></script>
+<script src="static/app/dbmodel/js/main.js"></script>
+<script type="text/javascript">
+Global = {};
+Global.base = '${base}';
+Global.projectId = '${projectId}'; 
+</script>
+</html>

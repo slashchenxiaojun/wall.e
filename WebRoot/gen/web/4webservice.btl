@@ -1,0 +1,66 @@
+package ${generate.package}.${generate.module_name}.service;
+
+import java.io.File;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.hacker.core.BaseService;
+import org.hacker.module.common.KExcel;
+
+import com.jfinal.plugin.activerecord.Db;
+import com.jfinal.plugin.activerecord.Page;
+import com.jfinal.plugin.activerecord.Record;
+@ var modelValueName = firstCharToLowerCase(model.class_name);
+
+public class ${model.class_name}Service extends BaseService {
+  
+  public Page<Record> getList(int pageNumber, int pageSize, String select, Map<String, Object> paras) {
+    String sql = getSql("${modelValueName}.page", paras);
+    return Db.paginate(pageNumber, pageSize, select, sql);
+  }
+  
+  public void importExcel(File excel) {
+    
+  }
+  
+  @ /* 默认没有注释的参数就直接跳过 */
+  public void exportExcel(String fileName, List<Record> list) {
+    String[] argumentNames = {
+    @ for(column in columns) {
+        @ if(column.name == "id") print("");
+        @ else {
+      "${column.name}"@ if(!columnLP.last)
+,
+        @ }
+    @ }
+
+    };
+    String[] argumentTypes = {
+    @ for(column in columns) {
+        @ /* 默认id是第一个位置 */
+        @ if(columnLP.first) print("");
+        @ else {
+      "${column.java_type}"@ if(!columnLP.last)
+,
+        @ }
+    @ }
+
+    };
+    String[] title = {
+    @ for(column in columns) {
+        @ /* 默认id是第一个位置 */
+        @ if(columnLP.first) print("");
+        @ else {
+      "${column.note}"@ if(!columnLP.last)
+,
+        @ }
+    @ }
+
+    };
+    
+    Map<String, String> customDateFormat = new HashMap<>();
+    KExcel.writer(fileName, list, argumentNames, argumentTypes, title, customDateFormat);
+  }
+  
+}

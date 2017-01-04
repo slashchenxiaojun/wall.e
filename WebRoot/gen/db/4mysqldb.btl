@@ -1,0 +1,65 @@
+@/* cancel the foreign key constraint */
+SET FOREIGN_KEY_CHECKS=0;
+
+@/* create db */
+CREATE SCHEMA IF NOT EXISTS `${db}` DEFAULT CHARACTER SET utf8 ;
+USE `${db}` ;
+
+DROP TABLE IF EXISTS `${db}`.`${model.name}`;
+CREATE TABLE `${db}`.`${model.name}` (
+@ for(col in columns) {
+  `${col.name}` ${col.type}@ 	if(col.type == "DECIMAL") {
+@	  print("(" + col.length + "," + col.decimal + ")");
+@   } else if(col.type == "DATETIME") {
+@	  print("");
+@	} else {
+@	  print("(" + col.length + ")");
+@	}
+@ 	if(col.is_required) {
+@ 		print(" NOT NULL");
+@ 	} else {
+@		var value = "";
+@		if(isEmpty(col.default_value)) {
+@			value = "NULL";
+@		} else if(col.type == "BIT") {
+@			value = "b'0'";
+@		} else if(col.type == "INTEGER" || col.type == "BIGINT") {
+@			value = col.default_value;
+@		} else if(col.type == "VARCHAR") {
+@			value = "'" + col.default_value + "'";
+@		}
+@		print(" DEFAULT " + value);
+@ 	}
+@ 	if(col.is_primary && (col.type == "INTEGER" || col.type == "BIGINT")) {
+@		print(" AUTO_INCREMENT");
+@	}
+@	if(isNotEmpty (col.note)) {
+@		print(" COMMENT '" + col.note + "'");
+@	}
+,
+@}
+@ for(fe in foreign) {
+  `${fe.master_name}_${fe.mapping_foreign_key}` ${fe.type}(${fe.length}) NOT NULL,
+@ }
+  PRIMARY KEY (`id`)@ if(foreign.~size != 0) {
+,
+@ }
+@ for(re in foreign) {
+  KEY `fk_${re.slaves_name}_${re.master_name}${reLP.index}_idx` (`${re.master_name}_id`),
+  CONSTRAINT `fk_${re.slaves_name}_${re.master_name}${reLP.index}` FOREIGN KEY (`${re.master_name}_id`) REFERENCES `${re.master_name}` (`${re.mapping_foreign_key}`) ON DELETE CASCADE ON UPDATE CASCADE@if(foreign.~size > 1 && !reLP.last) { print(","); }
+@ }
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+@ for(mp in mapping) {
+
+DROP TABLE IF EXISTS `${db}`.`mp_${mp.master_name}_${mp.slaves_name}`;
+CREATE TABLE `${db}`.`mp_${mp.master_name}_${mp.slaves_name}` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `${mp.master_name}_id` int(11) NOT NULL,
+  `${mp.slaves_name}_id` int(11) NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `fk_mp_${mp.master_name}_${mp.slaves_name}_${mp.master_name}_idx` (`${mp.master_name}_id`),
+  KEY `fk_mp_${mp.master_name}_${mp.slaves_name}_${mp.slaves_name}${mpLP.index}_idx` (`${mp.slaves_name}_id`),
+  CONSTRAINT `fk_mp_${mp.master_name}_${mp.slaves_name}_${mp.master_name}` FOREIGN KEY (`${mp.master_name}_id`) REFERENCES `${mp.master_name}` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `fk_mp_${mp.master_name}_${mp.slaves_name}_${mp.slaves_name}${mpLP.index}` FOREIGN KEY (`${mp.slaves_name}_id`) REFERENCES `${mp.slaves_name}` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+@ }

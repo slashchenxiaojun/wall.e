@@ -1,0 +1,26 @@
+@ var modelValueName = firstCharToLowerCase(model.class_name);
+#${model.class_name}(dbName=`${modelValueName}`)
+
+@ if(slaves.~size != 0) {
+slaves:
+@ }
+@ for(slave in slaves) {
+ ${slave.mapping_schema}: ${slave.slaves_name}
+@ }
+
+@ if(master.~size != 0) {
+master:
+@ }
+@ for(ma in master) {
+ ${ma.mapping_schema}: ${ma.master_name}
+@ }
+
+##page
+
+>jfinal page sql
+
+```page
+from ${model.name} 
+where 1 = 1
+order by id
+```

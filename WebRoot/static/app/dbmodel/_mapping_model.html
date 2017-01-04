@@ -1,0 +1,141 @@
+<!-- 确保已经导入了layerui如果父已经导入了 -->
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Wall-E create-DbModel</title>
+<link href="../static/module/layui/css/layui.css" rel="stylesheet">
+<link href="../static/app/dbmodel/css/create.css" rel="stylesheet">
+</head>
+<body project-id="">
+<div class="layui-form">
+  <form class="mapping-model-form">
+    <table class="layui-table" lay-skin="nob">
+      <colgroup>
+        <col width="200">
+        <col width="200">
+      </colgroup>
+      <tbody>
+        <tr>
+          <td>
+            <div class="layui-form-item">
+              <label class="layui-form-label">主表</label>
+              <div class="layui-input-block">
+                <input type="hidden" name="mapping.master_name">
+                <select name="mapping.master_id" lay-filter="master">
+                  <option value="">匹配映射表</option>
+                  @for(model in dbmodels) {
+                    <option value="${model.id}">${model.name} (${model.describe})</option>
+                  @}
+                </select>
+              </div>
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <div class="layui-form-item">
+              <label class="layui-form-label">映射模式</label>
+              <div class="layui-input-block">
+                <select name="mapping.mapping_schema" lay-filter="mapping_schema">
+                  <option value="">匹配映射模式</option>
+                  <option value="oneToOne">oneToOne</option>
+                  <option value="oneToMany">oneToMany</option>
+                  <option value="ManyToMany">ManyToMany</option>
+                </select>
+              </div>
+            </div>
+          </td>
+        </tr> 
+        <tr>
+          <td>
+            <div class="layui-form-item">
+              <label class="layui-form-label">从表</label>
+              <div class="layui-input-block">
+                <input type="hidden" name="mapping.slaves_name">
+                <select name="mapping.slaves_id" lay-filter="slaves">
+                  <option value="">匹配映射表</option>
+                  @for(model in dbmodels) {
+                    <option value="${model.id}">${model.name} (${model.describe})</option>
+                  @}
+                </select>
+              </div>
+            </div>
+          </td>
+        </tr>
+        <tr class="slaves-select">
+          <td>
+            <div class="layui-form-item">
+              <label class="layui-form-label">外键</label>
+              <div class="layui-input-block">
+                <select name="mapping.mapping_foreign_key" lay-filter="foreignKey">
+                  <option value="">匹配外键</option>
+                </select>
+              </div>
+            </div>
+          </td>
+        </tr> 
+      </tbody>
+    </table>
+  </form>
+</div>
+</body>
+<script src="../static/module/jquery/jquery-1.9.1.min.js"></script>
+<script src="../static/module/layui/layui.js"></script>
+<script type="text/javascript">
+Global = {};
+Global.base = '${base}';
+
+layui.use(['layer', 'form', 'element'], function() {
+  var 
+  $       = layui.jquery,
+  form    = layui.form(),
+  element = layui.element(),
+  layer   = layui.layer;
+
+  // 一些事件监听
+  form.on('select(mapping_schema)', function(data){
+    var schema = $(data.elem).find("option:selected").text();
+    // hide mapping_foreign_key
+    if(schema == 'ManyToMany') {
+      $('.slaves-select-no').addClass('slaves-select').removeClass('slaves-select-no');
+
+      $('select[name="dbmodel.mapping_foreign_key"]').attr('disabled', true);
+      form.render('select');
+    } else {
+      $('.slaves-select').addClass('slaves-select-no').removeClass('slaves-select');
+
+      $('select[name="dbmodel.mapping_foreign_key"]').removeAttr('disabled');
+      form.render('select');
+    }
+  });
+
+  // master|foreignKey
+  form.on('select(master)', function(data){
+    $('input[name="mapping.master_name"]').val($(data.elem).find("option:selected").text().split(' ')[0]);
+    var url = Global.base + '/dbmodel/getModelItem/' + data.value;
+    var deferred = $.getJSON(url);
+    $.when(deferred).done(function(result) {
+      if(result.code == 0) {
+        var select = $('select[name="mapping.mapping_foreign_key"]');
+        select.html('<option value="">匹配外键</option>');
+
+        $.each(result.data, function(i, v){
+          select.append('<option value="' + v.name + '">' + v.name + '</option>')
+        });
+        form.render('select');
+      } else {
+        layer.msg('Oop! 获取colunm失败');
+      }
+    }).fail(function() {
+      layer.msg('Oop! 系统错误');
+    });
+  });
+
+  form.on('select(slaves)', function(data){
+    $('input[name="mapping.slaves_name"]').val($(data.elem).find("option:selected").text().split(' ')[0]);
+  });
+
+});
+</script>
+</html>

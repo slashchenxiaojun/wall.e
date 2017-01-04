@@ -1,0 +1,140 @@
+@/*
+	for active record model enhance
+	provide pojo field, getter, setter
+	for this you can do something like orm model, example:
+	1.add annotation enhance field to adapt JSR303 validator or some other what you want do
+	2.adapt other orm frame like mybatis
+	3.for pojo not a map(active record stored data use map)
+	4.more expansibility
+@*/
+package ${generate.package}.${generate.module_name}.model;
+
+@ var need_datetime = false;
+@ var need_decimal = false;
+@ var need_list = false;
+@ if(master.~size != 0) { need_list = true; }
+@ if(slaves.~size != 0) { need_list = true; }
+@ for(col in columns) {
+@ 	if(col.type == "DATETIME") {
+@		need_datetime = true;
+@	} else if (col.type == "DECIMAL") {
+@		need_decimal = true;
+@	}
+@ }
+@ if(need_list) {
+import java.util.List;
+
+import com.jfinal.plugin.activerecord.Page;
+
+@ }
+@/* if(need_datetime) {
+import java.sql.Timestamp;
+
+@ }*/
+@ if(importNotNull) {
+import javax.validation.constraints.NotNull;
+
+@ }
+@/* if(need_decimal) {
+import java.math.BigDecimal;
+
+@ }*/
+import org.hacker.core.BaseModel;
+import org.hacker.core.plugin.Table;
+@ if(importLength || importNotBlank) {
+
+@ }
+@ if(importLength) {
+import org.hibernate.validator.constraints.Length;
+@ }
+@ if(importNotBlank) {
+import org.hibernate.validator.constraints.NotBlank;
+@ }
+
+\@Table(tableName="${model.name}")
+public class ${model.class_name} extends BaseModel<${model.class_name}> {
+
+  public static ${model.class_name} dao = new ${model.class_name}();
+
+@ for(col in columns) {
+@ if(col.is_required && col.java_type == "java.lang.String" && col.name != "id") { println("  @NotBlank"); }
+@ else if(col.is_required && col.java_type != "java.lang.String" && col.name != "id") { println("  @NotNull"); }
+@ if(col.java_type == "java.lang.String") { println("  @Length(max = " + col.length + ")"); }
+  public ${col.java_type} get@print(camelNameConvert(col.name));
+() { return get("${col.name}"); }
+
+@ }
+@ for(col in columns) {
+  public void set@print(camelNameConvert(col.name));
+(${col.java_type} ${col.name}) { set("${col.name}", ${col.name}); }
+
+@ }
+@ for(res in master) {
+@   /* oneToMany */
+@ 	if(res.mapping_schema == "oneToMany") {
+  public List<${res.package}.${res.module_name}.model.${res.class_name}> get${res.class_name}List() {
+    return ${res.package}.${res.module_name}.model.${res.class_name}.dao.find("select * from ${res.slaves_name} where ${res.master_name}_${res.mapping_foreign_key} = ?", get@print(camelNameConvert(res.mapping_foreign_key));
+());
+  }
+
+  public Page<${res.package}.${res.module_name}.model.${res.class_name}> get${res.class_name}Page(int pageNumber, int pageSize) {
+    return ${res.package}.${res.module_name}.model.${res.class_name}.dao.paginate(pageNumber, pageSize, "select * ", "from ${res.slaves_name} where ${res.master_name}_${res.mapping_foreign_key} = ?", get@print(camelNameConvert(res.mapping_foreign_key));
+());
+  }
+
+@	/* oneToOne */
+@ 	} else if(res.mapping_schema == "oneToOne") {
+  public ${res.package}.${res.module_name}.model.${res.class_name} get${res.class_name}() {
+    return ${res.package}.${res.module_name}.model.${res.class_name}.dao.findFirst("select * from ${res.slaves_name} where ${res.master_name}_${res.mapping_foreign_key} = ?", get@print(camelNameConvert(res.mapping_foreign_key));
+());
+  }
+
+@	/* ManyToMany */
+@	  } else if(res.mapping_schema == "ManyToMany") {
+  public List<${res.package}.${res.module_name}.model.${res.class_name}> get${res.class_name}List() {
+    return ${res.package}.${res.module_name}.model.${res.class_name}.dao.find("select b.* from mp_${res.master_name}_${res.slaves_name} a, ${res.master_name} b where a.${res.master_name}_id = b.id and a.${res.slaves_name}_id = ?", get@print(camelNameConvert(res.mapping_foreign_key));
+());
+  }
+
+  public Page<${res.package}.${res.module_name}.model.${res.class_name}> get${res.class_name}Page(int pageNumber, int pageSize) {
+    return ${res.package}.${res.module_name}.model.${res.class_name}.dao.paginate(pageNumber, pageSize, "select * ", "from mp_${res.master_name}_${res.slaves_name} a, ${res.master_name} b where a.${res.master_name}_id = b.id and a.${res.slaves_name}_id = ?", get@print(camelNameConvert(res.mapping_foreign_key));
+());
+  }
+
+@	  }
+@ }
+@ for(res in slaves) {
+@   /* oneToMany */
+@   if(res.mapping_schema == "oneToMany") {
+  public List<${res.package}.${res.module_name}.model.${res.class_name}> get${res.class_name}List() {
+    return ${res.package}.${res.module_name}.model.${res.class_name}.dao.find("select * from ${res.slaves_name} where ${res.master_name}_${res.mapping_foreign_key} = ?", get@print(camelNameConvert(res.mapping_foreign_key));
+());
+  }
+
+  public Page<${res.package}.${res.module_name}.model.${res.class_name}> get${res.class_name}Page(int pageNumber, int pageSize) {
+    return ${res.package}.${res.module_name}.model.${res.class_name}.dao.paginate(pageNumber, pageSize, "select * ", "from ${res.slaves_name} where ${res.master_name}_${res.mapping_foreign_key} = ?", get@print(camelNameConvert(res.mapping_foreign_key));
+());
+  }
+
+@   /* oneToOne */
+@   } else if(res.mapping_schema == "oneToOne") {
+  public ${res.package}.${res.module_name}.model.${res.class_name} get${res.class_name}() {
+    return ${res.package}.model.${res.module_name}.${res.class_name}.dao.findFirst("select * from ${res.slaves_name} where ${res.master_name}_${res.mapping_foreign_key} = ?", get@print(camelNameConvert(res.mapping_foreign_key));
+());
+  }
+
+@   /* ManyToMany */
+@     } else if(res.mapping_schema == "ManyToMany") {
+  public List<${res.package}.${res.module_name}.model.${res.class_name}> get${res.class_name}List() {
+    return ${res.package}.${res.module_name}.model.${res.class_name}.dao.find("select b.* from mp_${res.master_name}_${res.slaves_name} a, ${res.slaves_name} b where a.${res.slaves_name}_id = b.id and a.${res.master_name}_id = ?", get@print(camelNameConvert(res.mapping_foreign_key));
+());
+  }
+
+  public Page<${res.package}.${res.module_name}.model.${res.class_name}> get${res.class_name}Page(int pageNumber, int pageSize) {
+    return ${res.package}.${res.module_name}.model.${res.class_name}.dao.paginate(pageNumber, pageSize, "select b.* ", "from mp_${res.master_name}_${res.slaves_name} a, ${res.slaves_name} b where a.${res.slaves_name}_id = b.id and a.${res.master_name}_id = ?", get@print(camelNameConvert(res.mapping_foreign_key));
+());
+  }
+  
+@     }
+@ }
+}

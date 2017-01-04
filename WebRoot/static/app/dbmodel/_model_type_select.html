@@ -1,0 +1,17 @@
+<select name="model.type" lay-verify="required" lay-filter="type">
+  <option value="">物理类型</option>
+  <optgroup label="数值类型">
+    <option value="INTEGER">INTEGER</option>
+    <option value="BIGINT">BIGINT(通常是主键)</option>
+    <option value="DECIMAL">DECIMAL(用于浮点数)</option>
+  </optgroup>
+  <optgroup label="字符类型">
+    <option value="VARCHAR">VARCHAR</option>
+  </optgroup>
+  <optgroup label="日期类型">
+    <option value="DATETIME">DATETIME</option>
+  </optgroup>
+  <optgroup label="布尔类型">
+    <option value="BIT">BIT(用于bool)</option>
+  </optgroup>
+</select>

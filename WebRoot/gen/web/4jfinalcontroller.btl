@@ -1,0 +1,85 @@
+package ${generate.package}.${generate.module_name}.controller;
+
+import java.io.File;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+
+import org.hacker.core.BaseController;
+import org.hacker.core.TempFileRender;
+import org.hacker.exception.ApiException;
+import org.hacker.module.common.KDate;
+import ${generate.package}.${generate.module_name}.model.${model.class_name};
+import ${generate.package}.${generate.module_name}.service.${model.class_name}Service;
+
+import com.jfinal.aop.Before;
+import com.jfinal.plugin.activerecord.Page;
+import com.jfinal.plugin.activerecord.Record;
+import com.jfinal.plugin.activerecord.tx.Tx;
+
+public class ${model.class_name}Controller extends BaseController {
+@ var modelValueName = firstCharToLowerCase(model.class_name);
+
+  public void save() {
+    ${model.class_name} ${modelValueName} = getModel(${model.class_name}.class, "${modelValueName}");
+    JSR303Validator(${modelValueName});
+    if(${modelValueName}.save()) OK();
+    else Error(500, "Oop~ save ${modelValueName} fail.");
+  }
+  
+  public void get() {
+    Object id = getPara();
+    ${model.class_name} ${modelValueName} = ${model.class_name}.dao.findById(id);
+    OK(${modelValueName});
+  }
+  
+  public void list() {
+    Page<Record> page = list(null);
+    OK(page);
+  }
+  
+  public void delete() {
+    Object id = getPara();
+    if(${model.class_name}.dao.deleteById(id)) OK();
+    else Error(500, "Oop~ detele ${modelValueName} fail.");
+  }
+  
+  \@Before(Tx.class)
+  public void deleteAll() {
+    String id = getPara("${modelValueName}.ids");
+    String[] ids = id.split(",");
+    for(String _id : ids) {
+      if(!${model.class_name}.dao.deleteById(_id)) 
+        throw new ApiException("Oop~ detele ${modelValueName}s fail.");
+    }
+    OK();
+  }
+  
+  public void importExcel() {
+    File excel = getFile("excel").getFile();
+    ${model.class_name}Service ${modelValueName}Service = new ${model.class_name}Service();
+    ${modelValueName}Service.importExcel(excel);
+    OK();
+  }
+  
+  public void exportExcel() {
+    Page<Record> page = list(null);
+    List<Record> list = page.getList();
+    ${model.class_name}Service ${modelValueName}Service = new ${model.class_name}Service();
+    String fileName = KDate.format(new Date(), "yyyyMMddHHmmss") + ".xls";
+    ${modelValueName}Service.exportExcel(fileName, list);
+    File file = new File(fileName);
+    render(new TempFileRender(file));
+  }
+  
+  protected Page<Record> list(Map<String, Object> paras) {
+    Integer 
+    pageNumber  = getParaToInt("pageNumber", 1),
+    pageSize    = getParaToInt("pageSize", 10);
+    String select = "select * ";
+    ${model.class_name}Service ${modelValueName}Service = new ${model.class_name}Service();
+    Page<Record> page = ${modelValueName}Service.getList(pageNumber, pageSize, select, paras);
+    return page;
+  }
+  
+}

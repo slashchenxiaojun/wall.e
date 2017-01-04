@@ -1,0 +1,13 @@
+body {
+  padding: 10px;
+}
+.adapter-layui-select {
+  width: 100%;
+  height: 300px;
+}
+.create-form {
+  float: right;
+}
+.slaves-select {
+  display: none;
+}
