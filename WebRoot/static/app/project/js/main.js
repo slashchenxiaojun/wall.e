@@ -2,10 +2,32 @@ layui.use(['layer', 'form'], function() {
   var 
   $ = layui.jquery,
   tree = layui.tree,
-  form = layui.form,
+  form = layui.form(),
   layer = layui.layer;
 
   layer.msg('Hello World');
+
+  // ---------init---------
+  // 获取project的pattern
+  var pattern = $('select[name="project"] option:selected').attr('pattern');
+  if(pattern == 'normal') {
+    $('select[name="type"]').find('option').eq(1).attr('selected', true);
+  }else if(pattern == 'simulation'){
+    $('select[name="type"]').find('option').eq(2).attr('selected', true);
+  }
+  form.render('select');
+  // ---------init---------
+  
+  // 重新初始化ZTree,select[name="type"]
+  form.on('select(project)', function(data){
+    debugger
+    $(data.elem)
+  });
+
+  form.on('select(type)', function(data){
+    
+  });
+
 
   $('.create-folder').on('click', function(){
     layer.prompt({
@@ -63,7 +85,6 @@ $(function() {
           onClick: zTreeOnClick
         }
       };
-      // zTree 的数据属性，深入使用请参考 API 文档（zTreeNode 节点数据详解）
       var zNodes = r.data;
       $.fn.zTree.init($("#interface_tree"), setting, zNodes);
     }
@@ -80,18 +101,4 @@ $(function() {
     }
   }
 
-/*  $(document).on('click', '.create-folder', function() {
-    $.when($.getJSON('/project/createFolder', {
-      'project.id': project_id,
-      'folder.name': name
-    })).done(function(r) {
-      if(r.code == 0)
-        window.location.reload();
-      alert('Oop! fail.');
-    });
-  });*/
-
-  $(document).on('click', '.detele-folder', function() {
-
-  });
 });

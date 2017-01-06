@@ -2,24 +2,29 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Wall-E Project</title>
-<link href="static/module/layui/css/layui.css" rel="stylesheet">
+<title>Wall.E Project</title>
 <link href="static/app/project/css/main.css" rel="stylesheet">
+<link href="static/module/layui/css/layui.css" rel="stylesheet">
 <link href="static/module/ztree/css/zTreeStyle/custom_icon.css" rel="stylesheet">
 <link href="static/module/ztree/css/zTreeStyle/zTreeStyle.css" rel="stylesheet">
 </head>
 <body project-id="">
+  <div class="walle"></div>
 	<div class="header">
-    <form class="layui-form">
+    <form class="layui-form layui-main">
     	<div class="layui-inline">
-			  <select name="project" lay-verify="required">
+			  <select name="project" lay-verify="required" lay-filter="project">
 			    <option value="">选择项目</option>
+          @for(pro in projects) {
+            <option value="${pro.id}" pattern="${pro.pattern}" @if(proLP.first){print("selected");}
+>${pro.name}</option>
+          @}
 			  </select>
     	</div>
     	<div class="layui-inline">
-			  <select name="type" lay-verify="required">
+			  <select name="type" lay-verify="required" lay-filter="type">
 			    <option value="">选择模式</option>
-					<option value="norma">普通模式</option>
+					<option value="normal">普通模式</option>
 		      <option value="simulation">模拟模式</option>
 			  </select>
 		  </div>
@@ -33,16 +38,16 @@
   	<!-- main -->
   	<div class="site-content">
       <button class="layui-btn layui-btn-small create-folder">添加Folder</button>
-      <button class="layui-btn layui-btn-small detele-folder">删除Folder</button>
+      <button class="layui-btn layui-btn-small layui-btn-danger detele-folder">删除Folder</button>
   	</div>
   </div>
   <div class="foot">
   </div>
 </body>
-<script src="static/module/layui/layui.js"></script>
 <script src="static/module/jquery/jquery-1.9.1.min.js"></script>
-<script src="static/app/project/js/main.js"></script>
+<script src="static/module/layui/layui.js"></script>
 <script src="static/module/ztree/jquery.ztree.all.min.js"></script>
+<script src="static/app/project/js/main.js"></script>
 <script type="text/javascript">
 Global = {};
 Global.base = '${base}';

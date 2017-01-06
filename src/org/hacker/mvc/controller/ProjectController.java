@@ -13,7 +13,9 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 
 public class ProjectController extends BaseController {
-	public void index() {}
+	public void index() {
+	  setAttr("projects", Project.dao.find("select * from w_project"));
+	}
 	
 	public void folderForm() {
 		render("_folder_form.html");

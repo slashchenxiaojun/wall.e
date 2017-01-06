@@ -11,17 +11,17 @@
   border-right: 1px solid #eee;
 }
 .site-content {
-    width: 899px;
-    min-height: 900px;
-    padding: 20px 0 10px 20px;
+  width: 899px;
+  min-height: 900px;
+  padding: 20px 0 10px 20px;
 }
 .site-tree, .site-content {
-    display: inline-block;
-    vertical-align: top;
-    font-size: 14px;
+  display: inline-block;
+  vertical-align: top;
+  font-size: 14px;
 }
 .site-block .layui-form {
-    margin-right: 50px;
+  margin-right: 50px;
 }
 .tool-meun {
 	margin-left: 20px;
