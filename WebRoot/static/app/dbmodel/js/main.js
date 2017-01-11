@@ -1,10 +1,31 @@
-layui.use(['layer', 'form'], function() {
+layui.use(['layer', 'form', 'laypage'], function() {
   var 
   $ = layui.jquery,
   tree = layui.tree,
   form = layui.form,
+  laypage = layui.laypage,
   layer = layui.layer;
 
+  laypage({
+	  cont: 'paginate',
+	  pages: $('#paginate').attr('page'),
+	  curr: $('#paginate').attr('curr'),
+	  skip: true,
+	  jump: function(obj, first){
+		  if(first) return;
+		  // 得到了当前页，用于向服务端请求对应数据
+		  var curr = obj.curr;
+		  var url = window.location.href;
+		  if (url.indexOf('pageNumber') == -1 && curr != 1) {
+			  url += '&pageNumber=' + curr;
+			  window.location.replace(url);
+		  } else {
+			  url = url.substr(0, url.indexOf('pageNumber') + 'pageNumber='.length) + curr;
+			  window.location.replace(url);
+		  }
+	  }
+  });
+  
   // create model
   $('.create-model').on('click', function(){
     layer.open({

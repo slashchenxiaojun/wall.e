@@ -54,15 +54,18 @@ public class DBModelController extends BaseController {
 	
 	public void create_model() {
 	  Object projectId = getPara("projectId");
-	  
     Assert.checkNotNull(projectId, "projectId");
+    
     setAttr("projectId", projectId);
 		setAttr("dbmodels", DbModel.dao.find("select * from w_db_model"));
 		render("_create_modele.html");
 	}
 	
 	public void mapping_model() {
-	  setAttr("dbmodels", DbModel.dao.find("select * from w_db_model"));
+	  Object projectId = getPara("projectId");
+    Assert.checkNotNull(projectId, "projectId");
+    
+	  setAttr("dbmodels", DbModel.dao.find("select * from w_db_model where project_id = ?", projectId));
 	  render("_mapping_model.html");
 	}
 	
