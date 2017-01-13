@@ -9,7 +9,7 @@ import com.jfinal.core.JFinal;
 public class WALLERun {
 	
 	public static void main(String[] args) {
-		JFinal.start("WebRoot", 8080, "/", 1);
+		JFinal.start("src/main/webapp", 9090, "/walle", 1);
 	}
 	
 }

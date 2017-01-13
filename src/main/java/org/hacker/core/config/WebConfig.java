@@ -6,6 +6,7 @@ import org.hacker.aop.handler.GlobalHandler;
 import org.hacker.aop.interceptor.ErrorInterceptor;
 import org.hacker.core.Dict;
 import org.hacker.core.plugin.RoutePlugin;
+import org.hacker.mvc.controller.HomeController;
 
 import com.jfinal.config.Constants;
 import com.jfinal.config.Handlers;
@@ -29,6 +30,7 @@ public class WebConfig extends JFinalConfig {
 	@Override
 	public void configRoute(Routes me) {
 		new RoutePlugin(me).start();
+		me.add("/", HomeController.class, "home");
 	}
 
 	@Override

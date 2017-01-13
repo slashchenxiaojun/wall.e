@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Wall.E Project</title>
+<link href="static/app/home/css/create.css" rel="stylesheet">
+<link href="static/module/layui/css/layui.css" rel="stylesheet">
+</head>
+<body>
+	<div class="container layui-main site-inline">
+		<div class="container layui-main site-inline">
+			<fieldset class="layui-elem-field layui-field-title">
+				<legend>Create project</legend>
+			</fieldset>
+			<blockquote class="layui-elem-quote">wall.e generate
+				code base on a project</blockquote>
+			<form class="layui-form">
+				<fieldset class="layui-elem-field layui-field-title">
+					<legend>Project Name</legend>
+				</fieldset>
+				<div class="layui-form-item">
+					<input type="text" name="project.name" required lay-verify="required"
+						placeholder="" class="layui-input">
+				</div>
+
+				<fieldset class="layui-elem-field layui-field-title">
+					<legend>Project Base Url</legend>
+				</fieldset>
+				<div class="layui-form-item">
+					<input type="text" name="project.base_url" required lay-verify="required"
+						placeholder="Like: http://localhost:8080/projectName" class="layui-input">
+				</div>
+
+				<div class="layui-form-item">
+					<button class="layui-btn" lay-submit lay-filter="formDemo">Submit</button>
+					<button type="reset" class="layui-btn layui-btn-primary">Reset</button>
+				</div>
+			</form>
+		</div>
+	</div>
+</body>
+<script src="static/module/jquery/jquery-1.9.1.min.js"></script>
+<script src="static/module/layui/layui.js"></script>
+<script src="static/app/home/js/main.js"></script>
+<script type="text/javascript">
+	Global = {};
+	Global.base = '${base}';
+</script>
+</html>

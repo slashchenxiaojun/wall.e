@@ -5,7 +5,7 @@ layui.use(['layer', 'form'], function() {
   form = layui.form(),
   layer = layui.layer;
 
-  layer.msg('Hello World');
+  layer.msg('Welcome use wall.e');
 
   // ---------init---------
   // 获取project的pattern
@@ -15,6 +15,9 @@ layui.use(['layer', 'form'], function() {
   }else if(pattern == 'simulation'){
     $('select[name="type"]').find('option').eq(2).attr('selected', true);
   }
+  // init project select
+  var projectId = $('body').attr('project-id');
+  $('select[name="project"]').find('option[value=' + projectId + ']').attr('selected', true);
   form.render('select');
   // ---------init---------
   
@@ -34,7 +37,7 @@ layui.use(['layer', 'form'], function() {
       title: '请输入folder名称',
       area: ['400px', '50px'] //自定义文本域宽高
     }, function(value, index, elem){
-      $.when($.getJSON('/project/createFolder', {
+      $.when($.getJSON(Global.base + '/project/createFolder', {
         'project.id': $('body').attr('project-id'),
         'folder.name': value
       })).done(function(r) {
@@ -56,7 +59,7 @@ layui.use(['layer', 'form'], function() {
         layer.msg('请选择folder');
         return;
       }
-      $.when($.getJSON('/project/deteleFolder', {
+      $.when($.getJSON(Global.base + '/project/deteleFolder', {
         'folder.id': folder_id,
         'folder.name': value
       })).done(function(r) {
@@ -73,10 +76,12 @@ layui.use(['layer', 'form'], function() {
 
 $(function() {
   var zTreeObj;
-  var project_id = 1;
+  // 通过url判断
+  var project_id = window.location.search.substr('?projectId='.length);
+  if (project_id == undefined) project_id = 1;
   $('body').attr('project-id', project_id);
   
-  $.when($.getJSON('/project/getTreeFolder', {'project.id': project_id}))
+  $.when($.getJSON(Global.base + '/project/getTreeFolder', {'project.id': project_id}))
   .done(function(r) {
     if(r.code == 0) {
       // zTree 的参数配置，深入使用请参考 API 文档（setting 配置详解）
