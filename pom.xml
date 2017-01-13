@@ -122,11 +122,9 @@
 				<artifactId>jetty-maven-plugin</artifactId>
 				<version>9.2.8.v20150217</version>
 				<configuration>
-					<!-- 这个可以调整jetty插件的端口 -->
 					<httpConnector>
-						<port>8080</port>
+						<port>9090</port>
 					</httpConnector>
-					<!-- 这个是用来关闭当前的jetty的，建议每次不用了最好把jetty给关了，否则会出现端口占用的问题 -->
 					<stopKey>shutdown</stopKey>
 					<stopPort>9966</stopPort>
 					<scanIntervalSeconds>1</scanIntervalSeconds>
