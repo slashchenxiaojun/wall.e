@@ -146,7 +146,7 @@ s;
 @ 	if(res.mapping_schema == "oneToMany" || res.mapping_schema == "oneToOne") {
   public ${res.class_name} get${res.class_name}() { return ${className}; };
 
-  public void set${res.class_name}(${res.class_name} ${className}) { this.${className} = ${className}; }
+  public void set${res.class_name}(${res.class_name} ${className}) { this.${className} = ${className}; set("${res.master_name}_id", ${className}.getId()); }
 
 @	/* ManyToMany */
 @	} else if(res.mapping_schema == "ManyToMany") {
