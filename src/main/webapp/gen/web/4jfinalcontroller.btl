@@ -24,7 +24,7 @@ public class ${model.class_name}Controller extends BaseController {
     ${model.class_name} ${modelValueName} = getModel(${model.class_name}.class, "${modelValueName}");
     JSR303Validator(${modelValueName});
     if(${modelValueName}.save()) OK();
-    else Error(500, "Oop~ save ${modelValueName} fail.");
+    else Error(500, "Oop! save ${modelValueName} fail.");
   }
   
   public void get() {
@@ -41,7 +41,7 @@ public class ${model.class_name}Controller extends BaseController {
   public void delete() {
     Object id = getPara();
     if(${model.class_name}.dao.deleteById(id)) OK();
-    else Error(500, "Oop~ detele ${modelValueName} fail.");
+    else Error(500, "Oop! detele ${modelValueName} fail.");
   }
   
   \@Before(Tx.class)
@@ -50,7 +50,7 @@ public class ${model.class_name}Controller extends BaseController {
     String[] ids = id.split(",");
     for(String _id : ids) {
       if(!${model.class_name}.dao.deleteById(_id)) 
-        throw new ApiException("Oop~ detele ${modelValueName}s fail.");
+        throw new ApiException("Oop! detele ${modelValueName}s fail.");
     }
     OK();
   }

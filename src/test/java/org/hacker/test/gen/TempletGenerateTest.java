@@ -15,6 +15,7 @@ import org.hacker.mvc.model.DbModelMapping;
 import org.hacker.mvc.model.Generate;
 import org.hacker.mvc.view.CamelNameConvert;
 import org.hacker.mvc.view.FirstCharToLowerCase;
+import org.hacker.mvc.view.ToLowerCase;
 import org.hacker.service.TempletGenerate;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -28,7 +29,10 @@ public class TempletGenerateTest {
 	@BeforeClass
 	public static void init() throws IOException {
 		WebAppResourceLoader resourceLoader = new WebAppResourceLoader();
+		String root = "E:\\workspace\\WALL-E\\src\\main\\webapp";
+		resourceLoader.setRoot(root);
 		Configuration cfg = Configuration.defaultConfiguration();
+		
 		gt = new GroupTemplate(resourceLoader, cfg);
 		
 		PluginFactory.startActiveRecordPlugin();
@@ -37,8 +41,8 @@ public class TempletGenerateTest {
 	@Test
 	public void test_quest() {
 	  TempletGenerate tg = new TempletGenerate(
-	      "E:\\workspace\\WALL-E\\src", 
-	      "E:\\workspace\\WALL-E",
+	      "E:\\workspace\\gen_web\\src\\main\\java", 
+	      "E:\\workspace\\gen_web\\src\\main\\java",
 	      "walle");
 	  tg.quickGenerate(1, "walle");
 	}
@@ -108,8 +112,11 @@ public class TempletGenerateTest {
   public void test_pojo() {
     // 基础目录
 //    String basePath = "";
-    int id = 3;
+    int id = 5;
     gt.registerFunction("camelNameConvert", new CamelNameConvert());
+    gt.registerFunction("firstCharToLowerCase", new FirstCharToLowerCase());
+    gt.registerFunction("toLowerCase", new ToLowerCase());
+    
     DbModel model = DbModel.dao.findById(id);
     List<DbModelItem> columns = DbModelItem.dao.find("select * from w_db_model_item where w_model_id = ? order by serial", id);
     Generate generate = Generate.dao.findFirst("select * from w_generate where w_model_id = ?", id);
@@ -122,6 +129,10 @@ public class TempletGenerateTest {
     Template t = gt.getTemplate("gen/pojo/4ActiveRecordEnhance.btl");
     t.binding("model", model);
     t.binding("columns", columns);
+    
+    t.binding("importNotNull", true);
+    t.binding("importLength", true);
+    t.binding("importNotBlank", true);
     
     t.binding("generate", generate);
     t.binding("master", master);
@@ -169,7 +180,7 @@ public class TempletGenerateTest {
     // 查找出跟model相关的从表
     List<Record> slaves = Db.find("SELECT a.class_name, b.*, c.package, c.module_name FROM w_db_model a, w_db_model_mapping b, w_generate c WHERE a.id = b.slaves_id AND b.master_id = ? and c.w_model_id = b.slaves_id", id);
     
-    Template t = gt.getTemplate("gen/web/4webservice.btl");
+    Template t = gt.getTemplate("gen/web/4curd&webservice.btl");
     t.binding("model", model);
     t.binding("columns", columns);
     

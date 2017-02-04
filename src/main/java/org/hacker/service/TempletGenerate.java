@@ -46,6 +46,8 @@ public class TempletGenerate {
 	private String generateConfigRootPath;
 	// 默认的生成数据库名为`walle`
 	private String generateDbName;
+	// 兼容maven beetl的基础路径,否则模板不能被正确识别
+	private final String MAVEN_BASE = "src/main/webapp/";
 	
 	public TempletGenerate(String generateRootPath, String generateConfigRootPath, String generateDbName) {
 		WebAppResourceLoader resourceLoader = new WebAppResourceLoader();
@@ -101,7 +103,7 @@ public class TempletGenerate {
 	public void generateDB(DbModel model, String templatePath, String dbName) {
 	  if(model == null || model.getId() == null) 
 	    throw new GenerateException("Oop~ model is null.");
-	  if(StrKit.isBlank(templatePath)) templatePath = "gen/db/4mysqldb.btl";
+	  if(StrKit.isBlank(templatePath)) templatePath = MAVEN_BASE + "gen/db/4mysqldb.btl";
 	  Object id = model.getId();
 	  
 	  List<DbModelItem> columns = DbModelItem.dao.find("select * from w_db_model_item where w_model_id = ? order by serial", id);
@@ -150,7 +152,7 @@ public class TempletGenerate {
 	}
 	
 	public void generateModel(DbModel model, String templatePath, Map<String, Object> paras) {
-    if(StrKit.isBlank(templatePath)) templatePath = "gen/pojo/4ActiveRecordEnhance.btl";
+    if(StrKit.isBlank(templatePath)) templatePath = MAVEN_BASE + "gen/pojo/4ActiveRecordEnhance.btl";
     Template t_pojo = gt.getTemplate(templatePath);
     t_pojo.binding(paras);
     Generate generate = (Generate)paras.get("generate");
@@ -166,7 +168,7 @@ public class TempletGenerate {
 	}
 	
 	public void generateController(DbModel model, String templatePath, Map<String, Object> paras) {
-    if(StrKit.isBlank(templatePath)) templatePath = "gen/web/4Jfinalcontroller.btl";
+    if(StrKit.isBlank(templatePath)) templatePath = MAVEN_BASE + "gen/web/4Jfinalcontroller.btl";
     Template t_pojo = gt.getTemplate(templatePath);
     t_pojo.binding(paras);
     Generate generate = (Generate)paras.get("generate");
@@ -182,7 +184,7 @@ public class TempletGenerate {
   }
 	
 	public void generateService(DbModel model, String templatePath, Map<String, Object> paras) {
-    if(StrKit.isBlank(templatePath)) templatePath = "gen/web/4webservice.btl";
+    if(StrKit.isBlank(templatePath)) templatePath = MAVEN_BASE + "gen/web/4webservice.btl";
     Template t_pojo = gt.getTemplate(templatePath);
     t_pojo.binding(paras);
     Generate generate = (Generate)paras.get("generate");
@@ -198,7 +200,7 @@ public class TempletGenerate {
   }
 	
 	public void generateSql(DbModel model, String templatePath, Map<String, Object> paras) {
-    if(StrKit.isBlank(templatePath)) templatePath = "gen/web/4mysqlmd.btl";
+    if(StrKit.isBlank(templatePath)) templatePath = MAVEN_BASE + "gen/web/4mysqlmd.btl";
     Template t_pojo = gt.getTemplate(templatePath);
     t_pojo.binding(paras);
     Generate generate = (Generate)paras.get("generate");
@@ -214,7 +216,7 @@ public class TempletGenerate {
   }
 	
 	public void generateMappingModel(Object projectId, String templatePath) {
-	  if(StrKit.isBlank(templatePath)) templatePath = "gen/config/4jfinalmappingmodel.btl";
+	  if(StrKit.isBlank(templatePath)) templatePath = MAVEN_BASE + "gen/config/4jfinalmappingmodel.btl";
 	  Template t_pojo = gt.getTemplate(templatePath);
     List<Record> list = Db.find("select a.*, b.name primary_name, b.java_type, c.package, c.module_name from w_db_model a, w_db_model_item b, w_generate c where a.id = b.w_model_id and c.w_model_id = a.id and b.is_primary = 1 and a.project_id = ?", projectId);
 	  t_pojo.binding("models", list);
@@ -234,7 +236,7 @@ public class TempletGenerate {
 	}
 	
 	public void generateMappingRoute(Object projectId, String templatePath) {
-    if(StrKit.isBlank(templatePath)) templatePath = "gen/config/4jfinalmappingroute.btl";
+    if(StrKit.isBlank(templatePath)) templatePath = MAVEN_BASE + "gen/config/4jfinalmappingroute.btl";
     Template t_pojo = gt.getTemplate(templatePath);
     List<Record> list = Db.find("select a.*, b.name primary_name, b.java_type, c.package, c.module_name from w_db_model a, w_db_model_item b, w_generate c where a.id = b.w_model_id and c.w_model_id = a.id and b.is_primary = 1 and a.project_id = ?", projectId);
     t_pojo.binding("models", list);

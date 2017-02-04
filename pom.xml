@@ -118,6 +118,28 @@
 				</configuration>
 			</plugin>
 			<plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-war-plugin</artifactId>
+        <version>3.0.0</version>
+        <configuration>
+          <escapeString>\</escapeString>
+          <warName>walle</warName>
+          <webResources>
+            <resource>
+              <directory>src/main/resources</directory>
+              <targetPath>WEB-INF/classes</targetPath>
+              <filtering>true</filtering>
+            </resource>
+          </webResources>
+          <warSourceDirectory>src/main/webapp</warSourceDirectory>
+          <packagingExcludes>
+            WEB-INF/lib/jetty-*.jar,
+            WEB-INF/lib/javax.servlet*.jar
+          </packagingExcludes>
+          <webXml>src/main/webapp/WEB-INF/web.xml</webXml>
+        </configuration>
+      </plugin>
+			<plugin>
 				<groupId>org.eclipse.jetty</groupId>
 				<artifactId>jetty-maven-plugin</artifactId>
 				<version>9.2.8.v20150217</version>

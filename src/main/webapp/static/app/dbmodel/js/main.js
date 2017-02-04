@@ -93,7 +93,7 @@ layui.use(['layer', 'form', 'laypage'], function() {
     layer.confirm('确定删除该数据表吗?', {
       icon: 3, title:'删除'
     }, function(value, index){
-      var deferred = $.getJSON('/dbmodel/delete/' + id);
+      var deferred = $.getJSON(Global.base + '/dbmodel/delete/' + id);
       $.when(deferred).done(function(r) {
         if(r.code == 0) {
           window.location.reload();
@@ -115,7 +115,7 @@ layui.use(['layer', 'form', 'laypage'], function() {
     layer.confirm('确定同步数据表吗，这会删除原有表所有的数据?', {
       icon: 3, title:'同步数据表'
     }, function(value, index){
-      var deferred = $.getJSON('/dbmodel/syndb', {
+      var deferred = $.getJSON(Global.base + '/dbmodel/syndb', {
         modelId: id,
         dbName: dbName
       });
@@ -139,7 +139,7 @@ layui.use(['layer', 'form', 'laypage'], function() {
     layer.confirm('确定要生成代码吗?', {
       icon: 3, title:'生成代码'
     }, function(value, index){
-      var deferred = $.getJSON('/dbmodel/generate/' + id);
+      var deferred = $.getJSON(Global.base + '/dbmodel/generate/' + id);
       $.when(deferred).done(function(r) {
         if(r.code == 0) {
           layer.msg('生成代码完成');
@@ -163,7 +163,7 @@ layui.use(['layer', 'form', 'laypage'], function() {
     layer.confirm('确定要使用快速生成吗?', {
       icon: 3, title:'快速生成'
     }, function(value, index){
-      var deferred = $.getJSON('/dbmodel/quickGenerate/' + Global.projectId, {
+      var deferred = $.getJSON(Global.base + '/dbmodel/quickGenerate/' + Global.projectId, {
         dbName: dbName
       });
       $.when(deferred).done(function(r) {
