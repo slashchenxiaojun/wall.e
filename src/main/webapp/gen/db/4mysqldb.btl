@@ -49,13 +49,20 @@ CREATE TABLE `${db}`.`${model.name}` (
   CONSTRAINT `fk_${re.slaves_name}_${re.master_name}${reLP.index}` FOREIGN KEY (`${re.master_name}_id`) REFERENCES `${re.master_name}` (`${re.mapping_foreign_key}`) ON DELETE CASCADE ON UPDATE CASCADE@if(foreign.~size > 1 && !reLP.last) { print(","); }
 @ }
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+@ /* 主键类型-一般来说主键类型和master的主键一致，主键默认是id */
+@ var PrimaryKeyType = "int(11)";
+@ for (col in columns) { 
+@   if(col.is_primary && col.name == "id") {
+@     PrimaryKeyType = col.type + "(" + col.length + ")";
+@   } 
+@ }
 @ for(mp in mapping) {
 
 DROP TABLE IF EXISTS `${db}`.`mp_${mp.master_name}_${mp.slaves_name}`;
 CREATE TABLE `${db}`.`mp_${mp.master_name}_${mp.slaves_name}` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `${mp.master_name}_id` int(11) NOT NULL,
-  `${mp.slaves_name}_id` int(11) NOT NULL,
+  `${mp.master_name}_id` ${PrimaryKeyType} NOT NULL,
+  `${mp.slaves_name}_id` ${PrimaryKeyType} NOT NULL,
   PRIMARY KEY (`id`),
   KEY `fk_mp_${mp.master_name}_${mp.slaves_name}_${mp.master_name}_idx` (`${mp.master_name}_id`),
   KEY `fk_mp_${mp.master_name}_${mp.slaves_name}_${mp.slaves_name}${mpLP.index}_idx` (`${mp.slaves_name}_id`),
