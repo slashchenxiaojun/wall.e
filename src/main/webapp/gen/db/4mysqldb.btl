@@ -38,16 +38,16 @@ CREATE TABLE `${db}`.`${model.name}` (
 @	}
 ,
 @}
+  PRIMARY KEY (`id`)
+@ /****************************表数据结构改变，所有的关联关系均使用中间表表示************************************
 @ for(fe in foreign) {
   `${fe.master_name}_${fe.mapping_foreign_key}` ${fe.type}(${fe.length}) NOT NULL,
-@ }
-  PRIMARY KEY (`id`)@ if(foreign.~size != 0) {
-,
 @ }
 @ for(re in foreign) {
   KEY `fk_${re.slaves_name}_${re.master_name}${reLP.index}_idx` (`${re.master_name}_id`),
   CONSTRAINT `fk_${re.slaves_name}_${re.master_name}${reLP.index}` FOREIGN KEY (`${re.master_name}_id`) REFERENCES `${re.master_name}` (`${re.mapping_foreign_key}`) ON DELETE CASCADE ON UPDATE CASCADE@if(foreign.~size > 1 && !reLP.last) { print(","); }
 @ }
+@ *****************************************************************/
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 @ /* 主键类型-一般来说主键类型和master的主键一致，主键默认是id */
 @ var PrimaryKeyType = "int(11)";

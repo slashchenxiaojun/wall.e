@@ -3,7 +3,6 @@ package org.hacker.service;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -108,31 +107,32 @@ public class TempletGenerate {
 	  
 	  List<DbModelItem> columns = DbModelItem.dao.find("select * from w_db_model_item where w_model_id = ? order by serial", id);
     List<DbModelMapping> slaves = DbModelMapping.dao.find("select * from w_db_model_mapping where master_id = ?", id);
-    List<Record> master = Db.find("select t1.*, b.length, b.type from (select * from w_db_model_mapping where slaves_id = ?) t1, w_db_model_item b where b.w_model_id = t1.master_id and b.`name` = t1.mapping_foreign_key", id);
+//    List<Record> master = Db.find("select t1.*, b.length, b.type from (select * from w_db_model_mapping where slaves_id = ?) t1, w_db_model_item b where b.w_model_id = t1.master_id and b.`name` = t1.mapping_foreign_key", id);
     
+    // 修改数据结构，现在所有的关系，均使用中间表来表示
     // 当且仅当相关从表中含有ManyToMany关系时生成中间表
-    List<DbModelMapping> mapping = new ArrayList<>();
-    for(DbModelMapping mm : slaves) {
-      if(mm.getMappingSchema().equals("ManyToMany")) {
-        mapping.add(mm);
-      }
-    }
+//    List<DbModelMapping> mapping = new ArrayList<>();
+//    for(DbModelMapping mm : slaves) {
+//      if(mm.getMappingSchema().equals("ManyToMany")) {
+//        mapping.add(mm);
+//      }
+//    }
     
     // 当且仅当相关主表中含有oneToMany关系时需要生成外键
-    List<Record> foreign = new ArrayList<>();
-    for(Record mm : master) {
-      if(mm.getStr("mapping_schema").equals("oneToMany")) {
-        foreign.add(mm);
-      }
-    }
+//    List<Record> foreign = new ArrayList<>();
+//    for(Record mm : master) {
+//      if(mm.getStr("mapping_schema").equals("oneToMany")) {
+//        foreign.add(mm);
+//      }
+//    }
     
     Map<String, Object> paras = new HashMap<>();
     paras.put("db", dbName);
     paras.put("model", model);
     paras.put("columns", columns);
     
-    paras.put("mapping", mapping);
-    paras.put("foreign", foreign);
+    paras.put("mapping", slaves);
+//    paras.put("foreign", foreign);
     
     Template template = gt.getTemplate(templatePath);
    
