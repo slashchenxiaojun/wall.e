@@ -188,7 +188,7 @@ public class DBModelController extends BaseController {
 	      mp.update();
 	    }
 	    for (DbModelMapping mp : slaves) {
-	      mp.setMasterName(dbmodel.getName());
+	      mp.setSlavesName(dbmodel.getName());
 	      mp.update();
 	    }
 	  }
