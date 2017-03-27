@@ -16,6 +16,7 @@ import org.hacker.service.TempletGenerate;
 import com.jfinal.aop.Before;
 import com.jfinal.kit.PropKit;
 import com.jfinal.kit.StrKit;
+import com.jfinal.plugin.activerecord.Db;
 import com.jfinal.plugin.activerecord.tx.Tx;
 
 public class DBModelController extends BaseController {
@@ -57,8 +58,21 @@ public class DBModelController extends BaseController {
     Assert.checkNotNull(projectId, "projectId");
     
     setAttr("projectId", projectId);
-		setAttr("dbmodels", DbModel.dao.find("select * from w_db_model"));
 		render("_create_modele.html");
+	}
+	
+	public void update_model() {
+	  Object projectId = getPara("projectId");
+	  Object modelId = getPara("modelId");
+	  
+	  Assert.checkNotNull(projectId, "projectId");
+	  Assert.checkNotNull(modelId, "modelId");
+
+	  setAttr("projectId", projectId);
+	  setAttr("model", DbModel.dao.findFirst("select * from w_db_model where id = ? and project_id = ?", modelId, projectId));
+	  setAttr("generate", DbModel.dao.findFirst("select * from w_generate where w_model_id = ?", modelId));
+	  setAttr("modelItem", DbModelItem.dao.find("select b.* from w_db_model a left join w_db_model_item b on a.id = b.w_model_id where a.id = ? order by b.serial asc", modelId));
+	  render("_update_modele.html");
 	}
 	
 	public void mapping_model() {
@@ -139,6 +153,46 @@ public class DBModelController extends BaseController {
 			createDateTime("modify_date", "更新时间", dbmodel.getId(), serial++).save();
 		}
 		OK();
+	}
+	
+	@Before(Tx.class)
+	public void update() {
+	  DbModel dbmodel = getModel(DbModel.class, "dbmodel");
+	  Generate generate = getModel(Generate.class, "generate");
+	  List<DbModelItem> dbmodelItems = getModels(DbModelItem.class, "model");
+	  if(StrKit.isBlank(dbmodel.getClassName())) {
+	    dbmodel.setClassName(camelNameConvert(dbmodel.getName()));
+	  }
+	  if(StrKit.isBlank(generate.getModuleName())) {
+	    generate.setModuleName(dbmodel.getClassName().toLowerCase());
+	  }
+	  if(dbmodel.update()) {
+	    generate.update();
+	    //  delete first
+	    Db.update("delete from w_db_model_item where w_model_id = ?", dbmodel.getId());
+	    int serial = 0;
+	    for(DbModelItem item : dbmodelItems) {
+	      // 根据type设置java_type
+	      item.setJavaType(mysqlAndJavaType.get(item.getType()));
+	      item.setWModelId(dbmodel.getId());
+	      item.save();
+	      serial = item.getSerial();
+	    }
+	    createDateTime("create_date", "创建时间", dbmodel.getId(), serial++).save();
+	    createDateTime("modify_date", "更新时间", dbmodel.getId(), serial++).save();
+	    // update mapping...
+	    List<DbModelMapping> master = DbModelMapping.dao.find("select * from w_db_model_mapping where master_id = ?", dbmodel.getId());
+	    List<DbModelMapping> slaves = DbModelMapping.dao.find("select * from w_db_model_mapping where slaves_id = ?", dbmodel.getId());
+	    for (DbModelMapping mp : master) {
+	      mp.setMasterName(dbmodel.getName());
+	      mp.update();
+	    }
+	    for (DbModelMapping mp : slaves) {
+	      mp.setMasterName(dbmodel.getName());
+	      mp.update();
+	    }
+	  }
+	  OK();
 	}
 	
 	@Before(Tx.class)

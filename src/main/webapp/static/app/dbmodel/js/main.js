@@ -87,6 +87,38 @@ layui.use(['layer', 'form', 'laypage'], function() {
     return false;
   });
 
+  // update model
+  $('.update-form').on('click', function(){
+    var id = $(this).attr('data-id');
+    layer.open({
+      type: 2,
+      area: ['1024px', '530px'],
+      btn: ['保存', '关闭'],
+      fixed: false, //不固定
+      maxmin: true,
+      content: 'dbmodel/update_model' + window.location.search + '&modelId=' + id,
+      yes: function(index, dlayer) {
+        // 获取表单信息提交
+        var doc = dlayer.find('iframe')[0].contentWindow.document;
+        // 过滤input[type=checkbox].value
+        var model_data = $(doc).find('.dbmodel-form').serialize();
+        var model_items_data = $(doc).find('.dbmodel-item-form').serialize();
+        var url = Global.base + '/dbmodel/update';
+        var deferred = $.getJSON(url, model_data + '&' + model_items_data);
+        $.when(deferred).done(function(result) {
+          if(result.code == 0) {
+            window.location.reload();
+          } else {
+            layer.msg('Oop! 保存失败');
+          }
+        }).fail(function() {
+          layer.msg('Oop! 系统错误');
+        });
+      }
+    });
+    return false;
+  });
+  
   // delete model
   $('.delete-form').on('click', function(){
     var id = $(this).attr('data-id');

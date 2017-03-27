@@ -60,13 +60,11 @@ CREATE TABLE `${db}`.`${model.name}` (
 
 DROP TABLE IF EXISTS `${db}`.`mp_${mp.master_name}_${mp.slaves_name}`;
 CREATE TABLE `${db}`.`mp_${mp.master_name}_${mp.slaves_name}` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
   `${mp.master_name}_id` ${PrimaryKeyType} NOT NULL,
   `${mp.slaves_name}_id` ${PrimaryKeyType} NOT NULL,
-  PRIMARY KEY (`id`),
   KEY `fk_mp_${mp.master_name}_${mp.slaves_name}_${mp.master_name}_idx` (`${mp.master_name}_id`),
   KEY `fk_mp_${mp.master_name}_${mp.slaves_name}_${mp.slaves_name}${mpLP.index}_idx` (`${mp.slaves_name}_id`),
-  CONSTRAINT `fk_mp_${mp.master_name}_${mp.slaves_name}_${mp.master_name}` FOREIGN KEY (`${mp.master_name}_id`) REFERENCES `${mp.master_name}` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT `fk_mp_${mp.master_name}_${mp.slaves_name}_${mp.slaves_name}${mpLP.index}` FOREIGN KEY (`${mp.slaves_name}_id`) REFERENCES `${mp.slaves_name}` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+  CONSTRAINT `fk_mp_${mp.master_name}_${mp.slaves_name}_${mpLP.index - 1}` FOREIGN KEY (`${mp.master_name}_id`) REFERENCES `${mp.master_name}` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `fk_mp_${mp.master_name}_${mp.slaves_name}_${mpLP.index}` FOREIGN KEY (`${mp.slaves_name}_id`) REFERENCES `${mp.slaves_name}` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 @ }

@@ -3,7 +3,7 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Wall-E create-DbModel</title>
+<title>Wall-E update-DbModel</title>
 <link href="../static/module/layui/css/layui.css" rel="stylesheet">
 <link href="../static/app/dbmodel/css/create.css" rel="stylesheet">
 </head>
@@ -21,13 +21,14 @@
           <td>
             <label class="layui-form-label">model名称</label>
             <div class="layui-input-block">
-              <input name="dbmodel.name" type="text" placeholder="默认使用下划线命名,如: sys_user_car"class="layui-input">
+              <input name="dbmodel.id" type="hidden" value="${model.id}">
+              <input name="dbmodel.name" type="text" placeholder="默认使用下划线命名,如: sys_user_car"class="layui-input" value="${model.name}">
             </div>
           </td>
           <td>
             <label class="layui-form-label">model描述</label>
             <div class="layui-input-block">
-              <input name="dbmodel.describe" type="text" placeholder=""class="layui-input">
+              <input name="dbmodel.describe" type="text" placeholder=""class="layui-input" value="${model.describe}">
             </div>
           </td>
         </tr>
@@ -35,7 +36,7 @@
           <td>
             <label class="layui-form-label">类名</label>
             <div class="layui-input-block">
-              <input name="dbmodel.class_name" type="text" placeholder="如果为NULL默认为model名称的驼峰命名,如: SysUserCar"class="layui-input">
+              <input name="dbmodel.class_name" type="text" placeholder="如果为NULL默认为model名称的驼峰命名,如: SysUserCar"class="layui-input" value="${model.class_name}">
             </div>
           </td>
         </tr>
@@ -43,13 +44,14 @@
           <td>
             <label class="layui-form-label">包名</label>
             <div class="layui-input-block">
-              <input name="generate.package" type="text" placeholder="org.hacker.module" value="org.hacker.module" class="layui-input">
+              <input name="generate.id" type="hidden" value="${generate.id}">
+              <input name="generate.package" type="text" placeholder="org.hacker.module" class="layui-input" value="${generate.package}">
             </div>
           </td>
           <td>
             <label class="layui-form-label">模块名</label>
             <div class="layui-input-block">
-              <input name="generate.module_name" type="text" placeholder="可以跟类名一致(小写)" class="layui-input">
+              <input name="generate.module_name" type="text" placeholder="可以跟类名一致(小写)" class="layui-input" value="${generate.module_name}">
             </div>
           </td>
         </tr>
@@ -94,7 +96,68 @@
                 <th>操作</th>
               </tr> 
             </thead>
-            <tbody class="model-form-item"></tbody>
+            <tbody class="model-form-item">
+            @for (item in modelItem) {
+            @if (item.name == "create_date" || item.name == "modify_date") continue;
+            <tr>
+						  <input type="hidden" name="model.serial" value="${item.serial}">
+						  <td>${item.serial}</td>
+						  <td>
+						    <input name="model.name" type="text" placeholder="" class="layui-input" value="${item.name}">
+						  </td>
+						  <td>
+						    <input name="model.note" type="text" placeholder="注释可以帮助生成excel导出" class="layui-input" value="${item.note}">
+						  </td>
+						  <td>
+						    <select name="model.type" lay-verify="required" lay-filter="type">
+								  <option value="">物理类型</option>
+								  <optgroup label="数值类型">
+								    <option value="INTEGER" @if(item.type == "INTEGER") print("selected=true");
+								    >INTEGER</option>
+								    <option value="BIGINT" @if(item.type == "BIGINT") print("selected=true");
+								    >BIGINT(通常是主键)</option>
+								    <option value="DECIMAL" @if(item.type == "DECIMAL") print("selected=true");
+								    >DECIMAL(用于浮点数)</option>
+								  </optgroup>
+								  <optgroup label="字符类型">
+								    <option value="VARCHAR" @if(item.type == "VARCHAR") print("selected=true");
+								    >VARCHAR</option>
+								  </optgroup>
+								  <optgroup label="日期类型">
+								    <option value="DATETIME" @if(item.type == "DATETIME") print("selected=true");
+								    >DATETIME</option>
+								  </optgroup>
+								  <optgroup label="布尔类型">
+								    <option value="BIT" @if(item.type == "BIT") print("selected=true");
+								    >BIT(用于bool)</option>
+								  </optgroup>
+								</select>
+						  </td>
+						  <td>
+						    <input name="model.length" type="text" placeholder="" class="layui-input" value="${item.length}">
+						  </td>
+						  <td>
+						    <input name="model.decimal" type="text" placeholder="" class="layui-input" value="${item.decimal}">
+						  </td>
+						  <td>
+						    <input name="model.default_value" type="text" placeholder="" class="layui-input" value="${item.default_value}">
+						  </td>
+						  <td>
+						    <input name="model.is_primary" type="hidden" value="${item.is_primary}">
+						    <input type="checkbox" placeholder="" class="layui-input" lay-skin="switch" lay-filter="primary" @if(item.is_primary) print("checked=true");
+						    >
+						  </td>
+						  <td>
+						    <input name="model.is_required" type="hidden" value="${item.is_required}">
+						    <input type="checkbox" placeholder="" class="layui-input" lay-skin="switch" lay-filter="required" @if(item.is_required) print("checked=true");
+						    >
+						  </td>
+						  <td>
+						    <button class="layui-btn layui-btn-small layui-btn-danger delete-form">删除</button>
+						  </td>
+						</tr>
+            @}
+            </tbody>
           </table>
           <div class="adapter-layui-select"></div>
         </div>
@@ -194,25 +257,13 @@ layui.use(['layer', 'form', 'element'], function() {
       $(data.elem).prev().val(0)
     }
   });
-
-  // 初始化表单-主键
-  var item = $('#model-item').html();
-  item = item.replace(new RegExp(/SERIAL/g), 1);
-  $('.model-form-item').append(item);
   
-  // 初始化一个主键id
-  $('input[name="model.name"]').val('id');
-  $('select[name="model.type"]').find('option').eq(2).attr('selected', true);
-  $('input[name="model.length"]').val('10');
-  $('input[name="model.decimal"]').val('0');
-  $('input[name="model.is_primary"]').val(1);
-  $('input[name="model.is_required"]').val(1);
-  $('input[name="model.is_primary"]').next().attr('checked', true);
-  $('input[name="model.is_required"]').next().attr('checked', true);
+  // ---------------init-----------------
+  // 初始化表单
   form.render();
   // 初始化projectId
   $('input[name="dbmodel.project_id"]').val(${projectId});
-  // --------------------------------
+  // ---------------init-----------------
 
   $('.create-form').on('click', function(){
     var s = $('#model-item').html();
