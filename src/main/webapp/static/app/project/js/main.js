@@ -23,8 +23,8 @@ layui.use(['layer', 'form'], function() {
   
   // 重新初始化ZTree,select[name="type"]
   form.on('select(project)', function(data){
-    debugger
-    $(data.elem)
+    var url = window.location.href.substr(0, window.location.href.indexOf('?')) + '?projectId=' + data.value;
+    window.location.href = url;
   });
 
   form.on('select(type)', function(data){
@@ -34,7 +34,7 @@ layui.use(['layer', 'form'], function() {
 
   $('.create-folder').on('click', function(){
     layer.prompt({
-      title: '请输入folder名称',
+      title: '请输入Collections名称',
       area: ['400px', '50px'] //自定义文本域宽高
     }, function(value, index, elem){
       $.when($.getJSON(Global.base + '/project/createFolder', {
@@ -51,7 +51,7 @@ layui.use(['layer', 'form'], function() {
   });
 
   $('.detele-folder').on('click', function(){
-    layer.confirm('确定删除该folder吗?', {
+    layer.confirm('确定删除该Collections吗?', {
       icon: 3, title:'删除'
     }, function(value, index, elem){
       var folder_id = $('#interface_tree').attr('folder-id');
@@ -105,5 +105,20 @@ $(function() {
       $('#interface_tree').attr('interface-id', null)
     }
   }
+  // use contextjs
+  context.init({preventDoubleContext: false});
 
+  context.attach($('#interface_tree li'), [
+    { 
+      header: 'interface manger' 
+    },
+    {
+      text: 'create new interface', 
+      href: 'http://contextjs.com/context.js', 
+      target:'_blank',
+      action: function(e){
+        _gaq.push(['_trackEvent', 'ContextJS Download', this.pathname, this.innerHTML]);
+      }
+    }
+  ]);
 });

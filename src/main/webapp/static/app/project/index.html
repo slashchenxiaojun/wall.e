@@ -7,6 +7,7 @@
 <link href="static/module/layui/css/layui.css" rel="stylesheet">
 <link href="static/module/ztree/css/zTreeStyle/custom_icon.css" rel="stylesheet">
 <link href="static/module/ztree/css/zTreeStyle/zTreeStyle.css" rel="stylesheet">
+<link href="static/module/contextjs/css/context.standalone.css" rel="stylesheet">
 </head>
 <body project-id="">
   <div class="walle"></div>
@@ -33,12 +34,13 @@
   <div class="container layui-main site-inline">
   	<!-- menu tree -->
   	<div class="site-tree">
+  	  <span class="note">点击鼠标右键管理接口</span>
   		<ul id="interface_tree" class="ztree" folder-id="" interface-id=""></ul>
   	</div>
   	<!-- main -->
   	<div class="site-content">
-      <button class="layui-btn layui-btn-small create-folder">添加Folder</button>
-      <button class="layui-btn layui-btn-small layui-btn-danger detele-folder">删除Folder</button>
+      <button class="layui-btn layui-btn-small create-folder">Create New Collections</button>
+      <button class="layui-btn layui-btn-small layui-btn-danger detele-folder">Remove Old Collections</button>
   	</div>
   </div>
   <div class="foot">
@@ -47,6 +49,7 @@
 <script src="static/module/jquery/jquery-1.9.1.min.js"></script>
 <script src="static/module/layui/layui.js"></script>
 <script src="static/module/ztree/jquery.ztree.all.min.js"></script>
+<script src="static/module/contextjs/js/context.js"></script>
 <script src="static/app/project/js/main.js"></script>
 <script type="text/javascript">
 Global = {};
