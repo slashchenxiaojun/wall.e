@@ -18,7 +18,7 @@ layui.use(['layer', 'form'], function() {
   // init project select
   var projectId = $('body').attr('project-id');
   $('select[name="project"]').find('option[value=' + projectId + ']').attr('selected', true);
-  form.render('select');
+  form.render();
   // ---------init---------
   
   // 重新初始化ZTree,select[name="type"]
@@ -108,16 +108,36 @@ $(function() {
   // use contextjs
   context.init({preventDoubleContext: false});
 
-  context.attach($('#interface_tree li'), [
+  context.attach('#interface_tree li a', [
     { 
-      header: 'interface manger' 
+      header: '接口管理' 
     },
     {
-      text: 'create new interface', 
-      href: 'http://contextjs.com/context.js', 
+      text: '新增接口', 
       target:'_blank',
       action: function(e){
-        _gaq.push(['_trackEvent', 'ContextJS Download', this.pathname, this.innerHTML]);
+        e.preventDefault();
+        // 修改contextjs源代码后可以获取到被选择元素的id
+        var selectorId = $('.dropdown-context:not(.dropdown-context-sub)').attr('selector-id');
+        var collectionName = $('#' + selectorId).text();
+        console.log(collectionName);
+        layer.prompt({
+          title: '请输入接口名称',
+          area: ['400px', '50px'] //自定义文本域宽高
+        }, function(value, index, elem){
+          $.when($.getJSON(Global.base + '/project/createInterfaceQuick', {
+            'project.id': $('body').attr('project-id'),
+            'folder.name': collectionName,
+            'interface.name': value
+          })).done(function(r) {
+            if(r.code == 0) {
+              window.location.reload();
+            } else {
+              layer.msg('保存失败(' + r.msg + ')');
+            }
+          });
+        });
+        // ----- layer
       }
     }
   ]);

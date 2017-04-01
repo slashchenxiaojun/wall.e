@@ -10,7 +10,7 @@ Target Server Type    : MYSQL
 Target Server Version : 50542
 File Encoding         : 65001
 
-Date: 2017-04-01 08:48:42
+Date: 2017-04-01 10:09:56
 */
 
 SET FOREIGN_KEY_CHECKS=0;
@@ -111,9 +111,9 @@ CREATE TABLE `w_generate` (
 DROP TABLE IF EXISTS `w_interface`;
 CREATE TABLE `w_interface` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `code` varchar(45) NOT NULL COMMENT '接口唯一标识,请注意是项目中唯一，也就意味着在不同的2个项目中允许存在重名code的接口',
+  `code` varchar(45) DEFAULT NULL COMMENT '接口唯一标识,请注意是项目中唯一，也就意味着在不同的2个项目中允许存在重名code的接口',
   `name` varchar(45) NOT NULL,
-  `relative_url` varchar(100) NOT NULL COMMENT '访问接口的真实地址,相对于项目的base_url而言',
+  `relative_url` varchar(100) DEFAULT NULL COMMENT '访问接口的真实地址,相对于项目的base_url而言',
   `description` varchar(500) DEFAULT NULL,
   `data` varchar(1000) DEFAULT NULL COMMENT '模拟数据',
   `w_project_id` int(11) NOT NULL,
@@ -123,7 +123,7 @@ CREATE TABLE `w_interface` (
   KEY `fk_w_interface_w_folder1_idx` (`w_folder_id`),
   CONSTRAINT `fk_w_interface_w_folder1` FOREIGN KEY (`w_folder_id`) REFERENCES `w_folder` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_w_interface_w_project` FOREIGN KEY (`w_project_id`) REFERENCES `w_project` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='接口是WALL-E的核心，所有接口都是归于某个项目，接口与项目是ManyToOne的关系，为什么不是ManyToMany，因为那样的话违反了DRY(Don''t repect yourself)原则';
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8 COMMENT='接口是WALL-E的核心，所有接口都是归于某个项目，接口与项目是ManyToOne的关系，为什么不是ManyToMany，因为那样的话违反了DRY(Don''t repect yourself)原则';
 
 -- ----------------------------
 -- Table structure for w_interface_log
