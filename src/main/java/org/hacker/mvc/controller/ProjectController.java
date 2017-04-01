@@ -87,6 +87,8 @@ public class ProjectController extends BaseController {
 		checkNotNull(project_id, "project.id");
 		checkNotNull(name, "folder.name");
 		
+		// 检查同一个项目，同一个目录是否有相同名字的folder
+		
 		Folder folder = new Folder();
 		folder.setLevel(1);
 		folder.setName(name);
@@ -114,6 +116,10 @@ public class ProjectController extends BaseController {
 			Error(500, "Oop! delete folder fail.");
 	}
 	
+	public void createInterface() {
+	  
+	}
+	
 	/**
 	 * 适配layui-tree的数据结构,并且暂时只支持一层
 	 * @return
@@ -130,5 +136,10 @@ public class ProjectController extends BaseController {
 	private List<Interface> getInterfaceNode(int folder_id) {
 		List<Interface> list = Interface.dao.find("select * from w_interface a where a.w_folder_id = ?", folder_id);
 		return list;
+	}
+	
+	// 检查同一项目，同一层级是否存在相同名字的foler
+	private void checkSameFolderName(Object projectId, int level, String folderName) {
+	  
 	}
 }

@@ -23,11 +23,9 @@ public class _MappingKit {
 		arp.addMapping("w_generate", "id", Generate.class);
 		arp.addMapping("w_interface", "id", Interface.class);
 		arp.addMapping("w_interface_log", "id", InterfaceLog.class);
-		arp.addMapping("w_meta_data", "id", MetaData.class);
 		arp.addMapping("w_parameter", "id", Parameter.class);
 		arp.addMapping("w_project", "id", Project.class);
 		arp.addMapping("w_result_data", "id", ResultData.class);
-		arp.addMapping("w_simulation_data", "id", SimulationData.class);
 	}
 }
 
