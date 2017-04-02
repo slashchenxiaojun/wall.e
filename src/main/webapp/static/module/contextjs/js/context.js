@@ -102,20 +102,22 @@ var context = context || (function () {
 			e.preventDefault();
 			e.stopPropagation();
 			/* 修改源代码添加功能右键点击后可以定位到点击对象 */
-			var _this = $(this);
-			/* 通过给选择对象添加id的方式曲线救国 */
-			var selectorId = null;
-			if ($(_this).attr('id') == null) {
-				var currtDate = new Date();
-				selectorId = currtDate.getTime() * Math.floor(Math.random()*100000);
-				$(_this).attr('id', selectorId);
-			} else {
-				selectorId = $(_this).attr('id');
-			}
-			var _context = $('.dropdown-context:not(.dropdown-context-sub)');
-			_context.attr('selector-id', selectorId);
-			_context.hide();
+			// var _this = $(this);
+			// /* 通过给选择对象添加id的方式曲线救国 */
+			// var selectorId = null;
+			// if ($(_this).attr('id') == null) {
+			// 	var currtDate = new Date();
+			// 	selectorId = currtDate.getTime() * Math.floor(Math.random()*100000);
+			// 	$(_this).attr('id', selectorId);
+			// } else {
+			// 	selectorId = $(_this).attr('id');
+			// }
+			// var _context = $('.dropdown-context:not(.dropdown-context-sub)');
+			// _context.attr('selector-id', selectorId);
+			// _context.hide();
+			/* ---------------- */
 			
+			$('.dropdown-context:not(.dropdown-context-sub)').hide();
 			$dd = $('#dropdown-' + id);
 			if (typeof options.above == 'boolean' && options.above) {
 				$dd.addClass('dropdown-context-up').css({

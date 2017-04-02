@@ -102,6 +102,28 @@ public class ProjectController extends BaseController {
 			Error(500, "Oop! create folder fail.");
 	}
 	
+	public void renameFolder() {
+	  Integer project_id = getParaToInt("project.id");
+	  Integer folder_id = getParaToInt("folder.id");
+    String name = getPara("folder.name");
+    
+    checkNotNull(project_id, "project.id");
+    checkNotNull(folder_id, "folder.id");
+    checkNotNull(name, "folder.name");
+    
+    // 检查同一个项目，同一个目录是否有相同名字的folder
+    checkSameFolderName(project_id, 1, name);
+    Folder folder = Folder.dao.findById(folder_id);
+    if (folder == null) {
+      Error(500, "Oop! folder not exit."); return;
+    }
+    folder.setName(name);
+    if(folder.update())
+      OK();
+    else
+      Error(500, "Oop! create folder fail.");
+	}
+	
 	public void deteleFolder() {
 		Integer folder_id = getParaToInt("folder.id");
 		
@@ -125,16 +147,16 @@ public class ProjectController extends BaseController {
 	// 快速创建接口
 	public void createInterfaceQuick() {
 	  Integer projectId = getParaToInt("project.id");
-	  String folderName = getPara("folder.name");
+	  String folderId = getPara("folder.id");
 	  String name = getPara("interface.name");
 //	  String code = getPara("interface.code");
 	  
 	  checkNotNull(projectId, "project.id");
-	  checkNotNull(folderName, "folder.name");
+	  checkNotNull(folderId, "folder.id");
 	  checkNotNull(name, "interface.name");
 //	  checkNotNull(code, "interface.code");
 	  
-	  Folder folder = Folder.dao.findFirst("select * from w_folder where `name` = ? and `level` = ?", folderName, 1);
+	  Folder folder = Folder.dao.findById(folderId);
 	  if (folder == null) {
 	    Error(500, "Oop! not exist folder name.");
 	  }
@@ -149,6 +171,38 @@ public class ProjectController extends BaseController {
 	    OK();
 	  else
 	    Error(500, "Oop! create interface fail.");
+	}
+	
+	public void renameInterface() {
+	  Integer projectId = getParaToInt("project.id");
+    String interfaceId = getPara("interface.id");
+    String name = getPara("interface.name");
+    
+    checkNotNull(projectId, "project.id");
+    checkNotNull(interfaceId, "interface.id");
+    checkNotNull(name, "interface.name");
+    
+    Interface interfaces = Interface.dao.findById(interfaceId);
+    if (interfaces == null) {
+      Error(500, "Oop! not exist folder name.");
+    }
+    
+    interfaces.setName(name);
+    if (interfaces.update())
+      OK();
+    else
+      Error(500, "Oop! create interface fail.");
+	}
+	
+	public void deteleInterface() {
+	  Integer interface_id = getParaToInt("interface.id");
+    
+    checkNotNull(interface_id, "interface.id");
+    
+    if(Interface.dao.deleteById(interface_id))
+      OK();
+    else 
+      Error(500, "Oop! delete folder fail.");
 	}
 	
 	/**
