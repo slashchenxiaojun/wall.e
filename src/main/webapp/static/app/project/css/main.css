@@ -42,5 +42,20 @@
   top: 10px;
 }
 .note {
-  font-weight: 700;
+  color: #c5c0c0;
+}
+.create-folder {
+  margin-right: 35px;
+  margin-bottom: 5px;
+}
+.operation {
+  float: right;
+  font-size: 18px;
+}
+.operation i {
+  margin-left: 10px;
+  cursor:pointer
+}
+.test {
+  font-size: 19px;
 }

@@ -97,6 +97,7 @@ $(function() {
 
   var zTreeOnClick = function(event, treeId, treeNode) {
     var interface_id = treeNode.interface_id;
+    debugger
     if(interface_id != null) {
       $('#interface_tree').attr('folder-id', null)
       $('#interface_tree').attr('interface-id', interface_id)

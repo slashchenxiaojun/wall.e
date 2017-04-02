@@ -34,7 +34,7 @@
   <div class="container layui-main site-inline">
   	<!-- menu tree -->
   	<div class="site-tree">
-  	<button class="layui-btn layui-btn-small create-folder"><i class="layui-icon">&#xe654;</i>Create New Collections</button>
+  	<button class="layui-btn layui-btn-small create-folder"><i class="layui-icon">&#xe654;</i> Create New Collections</button>
   	  <span class="note">点击鼠标右键管理接口</span>
   	  
   		<ul id="interface_tree" class="ztree" folder-id="" interface-id=""></ul>
@@ -42,20 +42,17 @@
   	<!-- main -->
   	<div class="site-content">
       
-      <button class="layui-btn layui-btn-small layui-btn-danger detele-folder">Remove Old Collections</button>
-		  <table class="layui-table">
+		  <table class="layui-table" lay-skin="line">
 		    <colgroup>
-		      <col width="50">
+		      <col width="10">
 		      <col width="150">
-		      <col width="150">
-		      <col width="200">
+		      <col width="800">
 		      <col>
 		    </colgroup>
 		    <thead>
 		      <tr>
 		        <th><input type="checkbox" lay-filter="allChoose"></th>
-		        <th>接口名称</th>
-		        <th>接口code</th>
+		        <th>接口名称 (code)</th>
 		        <th></th>
 		      </tr> 
 		    </thead>
@@ -63,8 +60,11 @@
 		      <tr>
 		        <td><input type="checkbox"></td>
 		        <td>贤心</td>
-		        <td>汉族</td>
-		        <td>1989-10-14</td>
+		        <td class="operation">
+		          <i class="layui-icon test">&#xe623;</i>
+		          <i class="layui-icon setting">&#xe620;</i>
+		          <i class="layui-icon result">&#xe60e;</i>
+		        </td>
 		      </tr>
 		    </tbody>
 		  </table>
