@@ -51,7 +51,7 @@ import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
 
 @ }*/
-import org.hacker.core.BaseModel;
+import org.hacker.core.JPAModel;
 import org.hacker.core.plugin.Table;
 @ if(need_oneToOne || need_oneToMany || need_manyToOne || need_manyToMany) {
 
@@ -88,7 +88,7 @@ import org.hibernate.validator.constraints.NotBlank;
 @ }
 
 \@Table(tableName="${model.name}")
-public class ${model.class_name} extends BaseModel<${model.class_name}> {
+public class ${model.class_name} extends JPAModel<${model.class_name}> {
   public static final ${model.class_name} dao = new ${model.class_name}().dao();
 
 @ for (res in master) {
@@ -140,33 +140,53 @@ public class ${model.class_name} extends BaseModel<${model.class_name}> {
 (${col.java_type} ${col.name}) { set("${col.name}", ${col.name}); }
 
 @ }
-@ for(res in master) {
+@ for(res in slaves) {
 @  var className = firstCharToLowerCase(res.class_name);
 @   /* oneToMany */
-@ 	if(res.mapping_schema == "oneToMany" || res.mapping_schema == "oneToOne") {
-  public ${res.class_name} get${res.class_name}() { return ${className}; };
+@ 	if(res.mapping_schema == "oneToOne") {
+  public ${res.class_name} get${res.class_name}() {
+    if (${className} == null && getId() != null) {
+      ${className} = ${res.class_name}.dao.findFirst("select a.* from ${res.slaves_name} a left join mp_${res.master_name}_${res.slaves_name} b on a.id = b.${res.slaves_name}_id where b.${res.master_name}_id = ?", getId());
+    }
+    return ${className};
+  };
 
   public void set${res.class_name}(${res.class_name} ${className}) { this.${className} = ${className}; set("${res.master_name}_id", ${className}.getId()); }
 
 @	/* ManyToMany */
-@	} else if(res.mapping_schema == "ManyToMany") {
-  public Collection<${res.class_name}> get${res.class_name}() { return ${className}; };
+@	} else if(res.mapping_schema == "ManyToMany" || res.mapping_schema == "oneToMany") {
+  public Collection<${res.class_name}> get${res.class_name}() {
+    if (${className} == null && getId() != null) {
+      ${className} = ${res.class_name}.dao.find("select a.* from ${res.slaves_name} a left join mp_${res.master_name}_${res.slaves_name} b on a.id = b.${res.slaves_name}_id where b.${res.master_name}_id = ?", getId());
+    }
+    return ${className};
+  };
 
   public void set${res.class_name}(Collection<${res.class_name}> ${className}) { this.${className} = ${className}; }
 
 @	}
 @ }
-@ for(res in slaves) {
+@ for(res in master) {
 @  var className = firstCharToLowerCase(res.class_name);
 @   /* oneToMany */
-@   if(res.mapping_schema == "oneToOne") {
-  public ${res.class_name} get${res.class_name}() { return ${className}; };
+@   if(res.mapping_schema == "oneToOne" || res.mapping_schema == "oneToMany") {
+  public ${res.class_name} get${res.class_name}() {
+    if (${className} == null && getId() != null) {
+      ${className} = ${res.class_name}.dao.findFirst("select a.* from ${res.master_name} a left join mp_${res.master_name}_${res.slaves_name} b on a.id = b.${res.master_name}_id where b.${res.slaves_name}_id = ?", getId());
+    }
+    return ${className};
+  };
 
-  public void set${res.class_name}(${res.class_name}> ${className}) { this.${className} = ${className}; }
+  public void set${res.class_name}(${res.class_name} ${className}) { this.${className} = ${className}; }
 
 @   /* ManyToMany */
-@   } else if(res.mapping_schema == "ManyToMany" || res.mapping_schema == "oneToMany") {
-  public Collection<${res.class_name}> get${res.class_name}() { return ${className}; };
+@   } else if(res.mapping_schema == "ManyToMany" ) {
+  public Collection<${res.class_name}> get${res.class_name}() {
+    if (${className} == null && getId() != null) {
+      ${className} = ${res.class_name}.dao.find("select a.* from ${res.master_name} a left join mp_${res.master_name}_${res.slaves_name} b on a.id = b.${res.master_name}_id where b.${res.slaves_name}_id = ?", getId());
+    }
+    return ${className};
+  };
 
   public void set${res.class_name}(Collection<${res.class_name}> ${className}) { this.${className} = ${className}; }
 
