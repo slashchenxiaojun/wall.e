@@ -1,10 +1,12 @@
+form = null;
 layui.use(['layer', 'form'], function() {
   var 
   $ = layui.jquery,
   tree = layui.tree,
-  form = layui.form(),
   layer = layui.layer;
 
+  // 使用 form 作为全局对象，ztree代码需要使用
+  form = layui.form();
   layer.msg('Welcome use wall.e');
 
   // ---------init---------
@@ -50,10 +52,6 @@ layui.use(['layer', 'form'], function() {
     });
   });
 
-  $('.detele-folder').on('click', function(){
-    
-  });
-
 }); // layui-fun
 
 $(function() {
@@ -74,11 +72,23 @@ $(function() {
         }
       };
       var zNodes = r.data;
-      console.log(r.data)
       $.fn.zTree.init($("#interface_tree"), setting, zNodes);
     }
   });
 
+  // -----setting listen
+  $(document).on('click', '.test', function(e){
+    
+  });
+  
+  $(document).on('click', '.setting', function(e){
+    
+  });
+
+  $(document).on('click', '.result', function(e){
+
+  });
+  // -----
   var zTreeOnRightClick = function(event, treeId, treeNode) {
     if(treeNode.interface_id != null) {
       $('#interface_tree').attr('folder-id', null);
@@ -99,7 +109,36 @@ $(function() {
       $('#interface_tree').attr('folder-id', treeNode.folder_id);
       $('#interface_tree').attr('interface-id', null);
     }
+    
+    var folderId = $('#interface_tree').attr('folder-id');
+    $.when($.getJSON(Global.base + '/project/getInterfaceByFolder', {
+      'project.id': $('body').attr('project-id'),
+      'folder.id': folderId,
+    })).done(function(r) {
+      if(r.code == 0) {
+        // 刷新table
+        renderInterfaceTable(r.data);
+      } else {
+        layer.msg('获取接口列表失败(' + r.msg + ')');
+      }
+    });
   }
+
+  var renderInterfaceTable = function(data) {
+    $('.interfaceTable').html(null);
+    for (v in data) {
+      var interfaceNameAndCode = data[v].name + (data[v].code == null ? '' : ' (' + data[v].code + ')');
+      var tr = '<tr class="interface" data-id="' + data[v].id + '"><td><input type="checkbox"></td>'
+      + '<td>' + interfaceNameAndCode + '</td>'
+      + '<td class="operation">'
+      + '<i class="layui-icon test">&#xe623;</i>'
+      + '<i class="layui-icon setting">&#xe620;</i>'
+      + '<i class="layui-icon result">&#xe60e;</i>'
+      + '</td></tr>';
+      $('.interfaceTable').append(tr);
+    }
+  }
+
   // use contextjs
   context.init({preventDoubleContext: false});
 

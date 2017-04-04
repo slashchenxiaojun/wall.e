@@ -44,7 +44,7 @@ public class TempletGenerateTest {
 	      "E:\\workspace\\gen_web\\src\\main\\java", 
 	      "E:\\workspace\\gen_web\\src\\main\\java",
 	      "walle");
-	  tg.quickGenerate(1, "walle");
+	  tg.quickGenerate(1, "test");
 	}
 	
 //	@Test

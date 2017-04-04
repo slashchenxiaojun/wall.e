@@ -141,7 +141,13 @@ public class ProjectController extends BaseController {
 	
 	// 获取folder下的所有接口
 	public void getInterfaceByFolder() {
+	  Integer projectId = getParaToInt("project.id");
+	  Integer folderId = getParaToInt("folder.id");
 	  
+	  checkNotNull(projectId, "project.id");
+	  checkNotNull(folderId, "folder.id");
+	  
+	  OK(Interface.dao.find("select * from w_interface where w_project_id = ? and  w_folder_id = ?", projectId, folderId));
 	}
 	
 	// 快速创建接口
