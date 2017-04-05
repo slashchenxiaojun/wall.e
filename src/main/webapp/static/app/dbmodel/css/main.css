@@ -40,3 +40,9 @@
   left: 35px;
   top: 10px;
 }
+.genModule input {
+  display: block;
+  float: left;
+  margin-top: 0.4rem;
+  margin-right: 0.5rem
+}

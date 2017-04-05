@@ -165,19 +165,28 @@ layui.use(['layer', 'form', 'laypage'], function() {
     return false;
   });
 
+  var genModule = 
+  '<div class="genModule">' + 
+  '<input type="checkbox" name="genModule" lay-skin="primary" value="model"><div>model</div>' + 
+  '<input type="checkbox" name="genModule" lay-skin="primary" value="sql"><div>sql</div>' + 
+  '<input type="checkbox" name="genModule" lay-skin="primary" value="controller"><div>controller</div>' + 
+  '<input type="checkbox" name="genModule" lay-skin="primary" value="service"><div>service</div>' + 
+  '</div>'
+
   // generate code
   $('.gen-code').on('click', function(){
     var id = $(this).attr('data-id');
-    layer.confirm('确定要生成代码吗?', {
-      icon: 3, title:'生成代码'
+    layer.confirm('', {
+      icon: 3, title:'生成代码', 
+      content: genModule
     }, function(value, index){
-      var deferred = $.getJSON(Global.base + '/dbmodel/generate/' + id);
+      var deferred = $.getJSON(Global.base + '/dbmodel/generate/' + id + '?genModule=' + $('input[name="genModule"]:checked').map(function(){return this.value}).get().join(','));
       $.when(deferred).done(function(r) {
         if(r.code == 0) {
           layer.msg('生成代码完成');
-          setTimeout(function(){
+/*          setTimeout(function(){
             window.location.reload()
-          }, 1000);
+          }, 1000);*/
         } else {
           layer.msg('生成代码失败');
         }

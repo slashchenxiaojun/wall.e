@@ -117,13 +117,31 @@ public class DBModelController extends BaseController {
 	// 根据自定义的模板生成代码
 	public void generate() {
 	  Object modelId = getPara();
+	  String genModule = getPara("genModule");
 	  Assert.checkNotNull(modelId, "modelId");
+	  Assert.checkNotNull(genModule, "genModule");
 	  
+	  String[] genModules = genModule.split(",");
 	  DbModel model = DbModel.dao.findById(modelId);
 	  Map<String, Object> paras = tg.getGenerateParamter(model, true);
-	  tg.generateModel(model, null, paras);
-	  tg.generateService(model, null, paras);
-	  tg.generateController(model, null, paras);
+	  for (String module : genModules) {
+	    switch (module) {
+      case "model":
+        tg.generateModel(model, null, paras);
+        break;
+      case "sql":
+        tg.generateSql(model, null, paras);
+        break;
+      case "controller":
+        tg.generateController(model, null, paras);
+        break;
+      case "service":
+        tg.generateService(model, null, paras);
+        break;
+      default:
+        break;
+      }
+	  }
 	  OK();
 	}
 	
