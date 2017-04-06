@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Wall.E Edit Interface</title>
+<link href="${base}/static/module/layui/css/layui.css" rel="stylesheet">
+</head>
+<body>
+  <form class="layui-form" style="padding: 20px 70px 0 40px;">
+    <div class="layui-form-item">
+      <label class="layui-form-label">接口名称</label>
+      <label class="layui-form-label" style="padding-left: 0px;text-align: left;width: 78%;">${interface.name}</label>
+      <div class="layui-input-block">
+        <input type="hidden" name="interface.id" class="layui-input" value="${interface.id}">
+        <input type="hidden" name="interface.name" class="layui-input" value="${interface.name}">
+      </div>
+    </div>
+
+    <div class="layui-form-item">
+      <label class="layui-form-label">接口Code</label>
+      <div class="layui-input-block">
+        <input type="text" name="interface.code" class="layui-input" value="${interface.code}">
+      </div>
+    </div>
+
+    <div class="layui-form-item">
+      <label class="layui-form-label">接口地址</label>
+      <div class="layui-input-block">
+        <input type="text" name="interface.relative_url" class="layui-input" value="${interface.relative_url}">
+      </div>
+    </div>
+
+    <div class="layui-form-item">
+      <label class="layui-form-label">接口描述</label>
+      <div class="layui-input-block">
+        <textarea name="interface.description" class="layui-textarea">${interface.description}</textarea>
+      </div>
+    </div>
+
+    <div class="layui-form-item">
+      <div class="layui-input-block">
+        <button class="layui-btn save">保存</button>
+        <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+      </div>
+    </div>
+  </form>
+</body>
+<script src="${base}/static/module/jquery/jquery-1.9.1.min.js"></script>
+<script src="${base}/static/module/layui/layui.js"></script>
+<script type="text/javascript">
+Global = {};
+Global.base = '${base}';
+var index = parent.layer.getFrameIndex(window.name);
+var projectId = window.location.search.substring('?projectId='.length, window.location.search.indexOf('&'));
+$('.save').on('click', function(e) {
+  e.preventDefault();
+  var url = Global.base + '/project/saveInterface';
+  var data = $('form').serialize() + '&project.id=' + projectId;
+  $.when($.getJSON(url, data)).
+  done(function(r) {
+    if (r.code != 0) {
+      parent.layer.msg(r.msg);
+    } else {
+      parent.layer.close(index);
+      parent.layer.msg('保存成功');
+    }
+  });
+});
+</script>
+</html>

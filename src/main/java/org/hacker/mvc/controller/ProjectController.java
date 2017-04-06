@@ -179,6 +179,29 @@ public class ProjectController extends BaseController {
 	    Error(500, "Oop! create interface fail.");
 	}
 	
+	public void interfaceForm() {
+	  Integer interfaceId = getParaToInt("interfaceId");
+	  setAttr("interface", Interface.dao.findById(interfaceId));
+	  render("_interface_form.html");
+	}
+	
+	public void saveInterface() {
+	  Integer projectId = getParaToInt("project.id");
+	  Interface interfaces = getModel(Interface.class, "interface");
+	  
+	  checkNotNull(projectId, "project.id");
+	  checkNotNull(interfaces.getCode(), "interface.code");
+	  
+	  boolean create = interfaces.getId() == null;
+	  if (create) {
+	    throw new ApiException("Oop! interfaces id is null");
+	  } else {
+	    checkSameInterfaceCode(projectId, interfaces.getCode());
+	    if (interfaces.update()) OK();
+	    else Error(500, "Oop! save interface fail.");
+	  }
+	}
+	
 	public void renameInterface() {
 	  Integer projectId = getParaToInt("project.id");
     String interfaceId = getPara("interface.id");
@@ -236,9 +259,9 @@ public class ProjectController extends BaseController {
 	    throw new ApiException(String.format("Oop! projectId[%s] folder(level:[%n]) has same name{%s}.", projectId, level, folderName));
 	}
 	
-	private void checkSameInterfaceCode(Object projectId, Object folderId, String code) {
-	  Long count = Folder.dao.findFirst("select count(1) from w_interface where w_project_id = ? and w_folder_id = ? and `code` = ?", projectId, folderId, code).getLong("count(*)");
+	private void checkSameInterfaceCode(Object projectId, String code) {
+	  Long count = Folder.dao.findFirst("select count(1) from w_interface where w_project_id = ? and `code` = ?", projectId, code).getLong("count(1)");
 	  if (count > 0) 
-	    throw new ApiException(String.format("Oop! projectId[%s] interface(folderId:[%n]) has same code{%s}.", projectId, folderId, code));
+	    throw new ApiException(String.format("Oop! projectId[%s] interface has same code{%s}.", projectId, code));
 	}
 }

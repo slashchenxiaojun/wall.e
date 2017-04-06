@@ -33,7 +33,6 @@ layui.use(['layer', 'form'], function() {
     
   });
 
-
   $('.create-folder').on('click', function(){
     layer.prompt({
       title: '请输入Collections名称',
@@ -82,7 +81,14 @@ $(function() {
   });
   
   $(document).on('click', '.setting', function(e){
-    
+    var interfaceId = $(this).parent().parent().attr('data-id');
+    layer.open({
+      type: 2,
+      area: ['700px', '530px'],
+      fixed: false, //不固定
+      maxmin: true,
+      content: Global.base + '/project/interfaceForm?projectId=' + $('body').attr('project-id') + '&interfaceId=' + interfaceId
+    });
   });
 
   $(document).on('click', '.result', function(e){
