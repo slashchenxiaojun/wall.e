@@ -4,8 +4,29 @@
 <meta charset="UTF-8">
 <title>Wall.E Edit Interface</title>
 <link href="${base}/static/module/layui/css/layui.css" rel="stylesheet">
+<style>
+.alert-danger {
+  color: #a94442;
+  background-color: #f2dede;
+  border-color: #ebccd1;
+}
+.alert {
+  padding: 15px;
+  margin: 10px 70px 0 65px;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  display: none;
+}
+strong {
+  font-weight: 700;
+}
+</style>
 </head>
 <body>
+  <div class="alert alert-danger">
+    <strong>Oh snap!</strong>
+    <span>JSON GESH ERROR</span>
+  </div>
   <form class="layui-form" style="padding: 20px 70px 0 40px;">
     <div class="layui-form-item">
       <label class="layui-form-label">接口模拟数据(JSON)</label>
@@ -34,6 +55,10 @@ var projectId = window.location.search.substring('?projectId='.length, window.lo
 
 $('.save').on('click', function(e) {
   e.preventDefault();
+  // json格式错误不提交
+  if (!validateForm($('textarea').val()))
+	  return false;
+  
   var url = Global.base + '/project/saveInterface';
   var data = $('form').serialize() + '&project.id=' + projectId;
   $.when($.getJSON(url, data)).
@@ -55,8 +80,28 @@ $('.format-json').on('click', function(e) {
 		format = parent.formatJson(json);
 		$('textarea').val(format);
 	} catch(e) {
-		console.log(e);
+		showError(e);
 	}
 });
+
+// 保存接口之前先格式化json
+var validateForm = function(json) {
+	try {
+	  format = parent.formatJson(json);
+	  return true;
+	} catch(e) {
+	  showError(e);
+	}
+	return false;
+}
+
+var showError = function(e) {
+  $('.alert-danger').show();
+	$('.alert-danger span').html('JSON格式错误[' + e + ']');
+}
+
+var hideError = function() {
+	$('.alert-danger').hide();
+}
 </script>
 </html>
