@@ -9,11 +9,17 @@ import org.hacker.exception.ApiException;
 import org.hacker.mvc.model.Folder;
 import org.hacker.mvc.model.Interface;
 import org.hacker.mvc.model.Project;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.jfinal.kit.HttpKit;
+import com.jfinal.kit.StrKit;
 
 public class ProjectController extends BaseController {
+  Logger LOG = LoggerFactory.getLogger(getClass());
+  
 	public void index() {
 	  setAttr("projects", Project.dao.find("select * from w_project"));
 	}
@@ -164,7 +170,7 @@ public class ProjectController extends BaseController {
 	  
 	  Folder folder = Folder.dao.findById(folderId);
 	  if (folder == null) {
-	    Error(500, "Oop! not exist folder name.");
+	    Error(500, "Oop! not exist folder name."); return;
 	  }
 //	  checkSameInterfaceCode(projectId, folder.getId(), code);
 	  
@@ -185,6 +191,12 @@ public class ProjectController extends BaseController {
 	  render("_interface_form.html");
 	}
 	
+  public void interfaceData() {
+    Integer interfaceId = getParaToInt("interfaceId");
+    setAttr("interface", Interface.dao.findById(interfaceId));
+    render("_interface_data.html");
+  }	
+	
 	public void saveInterface() {
 	  Integer projectId = getParaToInt("project.id");
 	  Interface interfaces = getModel(Interface.class, "interface");
@@ -196,7 +208,7 @@ public class ProjectController extends BaseController {
 	  if (create) {
 	    throw new ApiException("Oop! interfaces id is null");
 	  } else {
-	    checkSameInterfaceCode(projectId, interfaces.getCode());
+	    checkSameInterfaceCode(projectId, interfaces.getCode(), interfaces.getId());
 	    if (interfaces.update()) OK();
 	    else Error(500, "Oop! save interface fail.");
 	  }
@@ -213,7 +225,7 @@ public class ProjectController extends BaseController {
     
     Interface interfaces = Interface.dao.findById(interfaceId);
     if (interfaces == null) {
-      Error(500, "Oop! not exist folder name.");
+      Error(500, "Oop! not exist folder name."); return;
     }
     
     interfaces.setName(name);
@@ -232,6 +244,31 @@ public class ProjectController extends BaseController {
       OK();
     else 
       Error(500, "Oop! delete folder fail.");
+	}
+	
+	public void invoke() {
+	  Integer interfaceId = getParaToInt("interface.id"); 
+	  
+	  checkNotNull(interfaceId, "interface.id");
+	  
+	  Interface interfaces = Interface.dao.findById(interfaceId);
+    if (interfaces == null) {
+      Error(500, "Oop! interface not exist."); return;
+    }
+    // http-client 因为接口调度会比较频繁，所以使用conntion-pool来操作
+    /**
+     * 使用连接池可以根据以往接口的调用频率来决策，因为连接池采取的都是长连接
+     */
+    String url = interfaces.getRelativeUrl();
+    if (StrKit.isBlank(url)) {
+      Error(500, "Oop! interface url not exist."); return;
+    }
+    if (interfaces.get("data") == null) {
+      Error(500, "Oop! interface data not exist."); return;
+    }
+    String result = HttpKit.post(url, interfaces.get("data").toString());
+    LOG.debug(String.format("ID[%n]-interface:[%s (%s)] invoke result:[%s]", interfaces.getId(), interfaces.getName(), interfaces.getCode(), result));
+    OK();
 	}
 	
 	/**
@@ -259,8 +296,8 @@ public class ProjectController extends BaseController {
 	    throw new ApiException(String.format("Oop! projectId[%s] folder(level:[%n]) has same name{%s}.", projectId, level, folderName));
 	}
 	
-	private void checkSameInterfaceCode(Object projectId, String code) {
-	  Long count = Folder.dao.findFirst("select count(1) from w_interface where w_project_id = ? and `code` = ?", projectId, code).getLong("count(1)");
+	private void checkSameInterfaceCode(Object projectId, String code, Object interfaceId) {
+	  Long count = Folder.dao.findFirst("select count(1) from w_interface where w_project_id = ? and `code` = ? and id <> ?", projectId, code, interfaceId).getLong("count(1)");
 	  if (count > 0) 
 	    throw new ApiException(String.format("Oop! projectId[%s] interface has same code{%s}.", projectId, code));
 	}

@@ -76,8 +76,35 @@ $(function() {
   });
 
   // -----setting listen
-  $(document).on('click', '.test', function(e){
-    
+  $(document).on('click', '.test', function(e) {
+    var interfaceId = $(this).parent().parent().attr('data-id');
+    var icon = $(this);
+    var tr = $(this).parent().parent();
+    // 执行接口时改变颜色 #f8f8f8 ---> #F7B824
+    tr.attr('style', 'background-color: #F7B824');
+    icon.html('&#xe63d;');
+    // 添加动画属性
+    icon.attr('style', 'display: inline-block;');
+    $.when($.getJSON(Global.base + '/project/invoke', {'interface.id': interfaceId}))
+    .done(function(r) {
+      if(r.code == 0) {
+        // 显示list绿色
+        tr.attr('style', 'background-color: #5FB878');
+        icon.html('&#xe623;');
+        icon.attr('style', null);
+      } else {
+        // 显示list红色
+        tr.attr('style', 'background-color: #FF5722');
+        icon.html('&#xe623;');
+        icon.attr('style', null);
+      }
+    }).fail(function() {
+      // 显示list红色
+      // 系统错误
+      tr.attr('style', 'background-color: #FF5722');
+      icon.html('&#xe623;');
+      icon.attr('style', null);
+    });
   });
   
   $(document).on('click', '.setting', function(e){
@@ -92,7 +119,14 @@ $(function() {
   });
 
   $(document).on('click', '.result', function(e){
-
+    var interfaceId = $(this).parent().parent().attr('data-id');
+    layer.open({
+      type: 2,
+      area: ['700px', '530px'],
+      fixed: false, //不固定
+      maxmin: true,
+      content: Global.base + '/project/interfaceData?projectId=' + $('body').attr('project-id') + '&interfaceId=' + interfaceId
+    });
   });
   // -----
   var zTreeOnRightClick = function(event, treeId, treeNode) {
@@ -137,7 +171,7 @@ $(function() {
       var tr = '<tr class="interface" data-id="' + data[v].id + '"><td><input type="checkbox"></td>'
       + '<td>' + interfaceNameAndCode + '</td>'
       + '<td class="operation">'
-      + '<i class="layui-icon test">&#xe623;</i>'
+      + '<i class="layui-icon layui-anim layui-anim-rotate layui-anim-loop test">&#xe623;</i>' //
       + '<i class="layui-icon setting">&#xe620;</i>'
       + '<i class="layui-icon result">&#xe60e;</i>'
       + '</td></tr>';

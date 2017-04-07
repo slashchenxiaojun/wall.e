@@ -21,6 +21,7 @@
 		<log4j.version>1.2.16</log4j.version>
 		<slf4j.version>1.6.1</slf4j.version>
 		<fastjson.version>1.2.7</fastjson.version>
+		<httpclient.version>4.5.2</httpclient.version>
 		<hibernate-validator.version>5.3.4.Final</hibernate-validator.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<maven.compiler.encoding>UTF-8</maven.compiler.encoding>
@@ -104,6 +105,11 @@
 			<artifactId>fastjson</artifactId>
 			<version>${fastjson.version}</version>
 		</dependency>
+		<dependency>
+			<groupId>org.apache.httpcomponents</groupId>
+			<artifactId>httpclient</artifactId>
+			<version>${httpclient.version}</version>
+		</dependency>
 	</dependencies>
 	<build>
 		<plugins>
@@ -118,27 +124,27 @@
 				</configuration>
 			</plugin>
 			<plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-war-plugin</artifactId>
-        <version>3.0.0</version>
-        <configuration>
-          <escapeString>\</escapeString>
-          <warName>walle</warName>
-          <webResources>
-            <resource>
-              <directory>src/main/resources</directory>
-              <targetPath>WEB-INF/classes</targetPath>
-              <filtering>true</filtering>
-            </resource>
-          </webResources>
-          <warSourceDirectory>src/main/webapp</warSourceDirectory>
-          <packagingExcludes>
-            WEB-INF/lib/jetty-*.jar,
-            WEB-INF/lib/javax.servlet*.jar
-          </packagingExcludes>
-          <webXml>src/main/webapp/WEB-INF/web.xml</webXml>
-        </configuration>
-      </plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-war-plugin</artifactId>
+				<version>3.0.0</version>
+				<configuration>
+					<escapeString>\</escapeString>
+					<warName>walle</warName>
+					<webResources>
+						<resource>
+							<directory>src/main/resources</directory>
+							<targetPath>WEB-INF/classes</targetPath>
+							<filtering>true</filtering>
+						</resource>
+					</webResources>
+					<warSourceDirectory>src/main/webapp</warSourceDirectory>
+					<packagingExcludes>
+						WEB-INF/lib/jetty-*.jar,
+						WEB-INF/lib/javax.servlet*.jar
+					</packagingExcludes>
+					<webXml>src/main/webapp/WEB-INF/web.xml</webXml>
+				</configuration>
+			</plugin>
 			<plugin>
 				<groupId>org.eclipse.jetty</groupId>
 				<artifactId>jetty-maven-plugin</artifactId>

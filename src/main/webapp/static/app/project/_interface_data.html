@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Wall.E Edit Interface</title>
+<link href="${base}/static/module/layui/css/layui.css" rel="stylesheet">
+</head>
+<body>
+  <form class="layui-form" style="padding: 20px 70px 0 40px;">
+    <div class="layui-form-item">
+      <label class="layui-form-label">接口模拟数据(JSON)</label>
+      <div class="layui-input-block">
+        <input type="hidden" name="interface.id" class="layui-input" value="${interface.id}">
+        <input type="hidden" name="interface.code" class="layui-input" value="${interface.code}">
+        <textarea name="interface.data" class="layui-textarea" style="height: 350px;">${interface.data}</textarea>
+      </div>
+    </div>
+
+    <div class="layui-form-item">
+      <div class="layui-input-block">
+        <button class="layui-btn save">保存</button>
+        <button class="layui-btn layui-btn-primary format-json">JSON格式化</button>
+      </div>
+    </div>
+  </form>
+</body>
+<script src="${base}/static/module/jquery/jquery-1.9.1.min.js"></script>
+<script src="${base}/static/module/layui/layui.js"></script>
+<script type="text/javascript">
+Global = {};
+Global.base = '${base}';
+var index = parent.layer.getFrameIndex(window.name);
+var projectId = window.location.search.substring('?projectId='.length, window.location.search.indexOf('&'));
+
+$('.save').on('click', function(e) {
+  e.preventDefault();
+  var url = Global.base + '/project/saveInterface';
+  var data = $('form').serialize() + '&project.id=' + projectId;
+  $.when($.getJSON(url, data)).
+  done(function(r) {
+    if (r.code != 0) {
+      parent.layer.msg(r.msg);
+    } else {
+      parent.layer.close(index);
+      parent.layer.msg('保存成功');
+    }
+  });
+});
+
+$('.format-json').on('click', function(e) {
+	e.preventDefault();
+	var json = $('textarea').val();
+	var format = null;
+	try {
+		format = parent.formatJson(json);
+		$('textarea').val(format);
+	} catch(e) {
+		console.log(e);
+	}
+});
+</script>
+</html>
