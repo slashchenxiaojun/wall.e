@@ -197,6 +197,12 @@ public class ProjectController extends BaseController {
     render("_interface_data.html");
   }	
 	
+  public void interfaceSimulationData() {
+    Integer interfaceId = getParaToInt("interfaceId");
+    setAttr("interface", Interface.dao.findById(interfaceId));
+    render("_interface_simulation_data.html");
+  }
+  
 	public void saveInterface() {
 	  Integer projectId = getParaToInt("project.id");
 	  Interface interfaces = getModel(Interface.class, "interface");

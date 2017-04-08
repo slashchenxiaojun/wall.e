@@ -128,6 +128,18 @@ $(function() {
       content: Global.base + '/project/interfaceData?projectId=' + $('body').attr('project-id') + '&interfaceId=' + interfaceId
     });
   });
+
+  $(document).on('click', '.simulation', function(e){
+    var interfaceId = $(this).parent().parent().attr('data-id');
+    layer.open({
+      type: 2,
+      area: ['700px', '530px'],
+      fixed: false, //不固定
+      maxmin: true,
+      content: Global.base + '/project/interfaceSimulationData?projectId=' + $('body').attr('project-id') + '&interfaceId=' + interfaceId
+    });
+  });
+  
   // -----
   var zTreeOnRightClick = function(event, treeId, treeNode) {
     if(treeNode.interface_id != null) {
@@ -174,6 +186,7 @@ $(function() {
       + '<i class="layui-icon layui-anim layui-anim-rotate layui-anim-loop test">&#xe623;</i>' //
       + '<i class="layui-icon setting">&#xe620;</i>'
       + '<i class="layui-icon result">&#xe60e;</i>'
+      + '<i class="layui-icon simulation">&#xe60b;</i>'
       + '</td></tr>';
       $('.interfaceTable').append(tr);
     }
