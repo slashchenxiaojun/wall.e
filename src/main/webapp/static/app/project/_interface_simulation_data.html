@@ -20,6 +20,9 @@
 strong {
   font-weight: 700;
 }
+i {
+  cursor:pointer;
+}
 </style>
 </head>
 <body>
@@ -28,12 +31,51 @@ strong {
     <span>JSON GESH ERROR</span>
   </div>
   <form class="layui-form" style="padding: 20px 70px 0 40px;">
+    <table class="layui-table">
+      <colgroup>
+        <col width="300">
+        <col width="300">
+        <col width="1">
+      </colgroup>
+      <thead>
+        <tr>
+          <th>key</th>
+          <th>value</th>
+          <th>
+        </tr> 
+      </thead>
+      <tbody>
+        <tr>
+          <td>
+            <input type="text" name="interface.id" class="layui-input" value="${interface.id}">
+          </td>
+          <td>
+            <input type="text" name="interface.id" class="layui-input" value="${interface.id}">
+          </td>
+          <td>
+            <i class="layui-icon">&#xe640;</i>   
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
     <div class="layui-form-item">
       <label class="layui-form-label">接口模拟数据(JSON)</label>
       <div class="layui-input-block">
         <input type="hidden" name="interface.id" class="layui-input" value="${interface.id}">
         <input type="hidden" name="interface.code" class="layui-input" value="${interface.code}">
         <textarea name="interface.data" class="layui-textarea" style="height: 350px;">${interface.data}</textarea>
+      </div>
+    </div>
+
+    <div class="layui-form-item">
+      <label class="layui-form-label">key</label>
+      <div class="layui-input-block">
+        <input type="text" name="interface.id" class="layui-input" value="${interface.id}">
+      </div>
+      <label class="layui-form-label">value</label>
+      <div class="layui-input-block">
+        <input type="text" name="interface.id" class="layui-input" value="${interface.id}">
       </div>
     </div>
 
