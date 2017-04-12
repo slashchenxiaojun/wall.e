@@ -47,7 +47,7 @@ layui.use(['layer', 'form', 'laypage'], function() {
           if(result.code == 0) {
             window.location.reload();
           } else {
-            layer.msg('Oop! 保存失败');
+            layer.msg(r.msg);
           }
         }).fail(function() {
           layer.msg('Oop! 系统错误');
@@ -77,7 +77,7 @@ layui.use(['layer', 'form', 'laypage'], function() {
           if(result.code == 0) {
             window.location.reload();
           } else {
-            layer.msg('Oop! 保存失败');
+            layer.msg(r.msg);
           }
         }).fail(function() {
           layer.msg('Oop! 系统错误');
@@ -109,7 +109,7 @@ layui.use(['layer', 'form', 'laypage'], function() {
           if(result.code == 0) {
             window.location.reload();
           } else {
-            layer.msg('Oop! 保存失败');
+            layer.msg(r.msg);
           }
         }).fail(function() {
           layer.msg('Oop! 系统错误');
@@ -130,7 +130,7 @@ layui.use(['layer', 'form', 'laypage'], function() {
         if(r.code == 0) {
           window.location.reload();
         } else {
-          layer.msg('删除失败');
+          layer.msg(r.msg);
         }
       });
     });
@@ -148,6 +148,7 @@ layui.use(['layer', 'form', 'laypage'], function() {
       icon: 3, title:'同步数据表'
     }, function(value, index){
       var deferred = $.getJSON(Global.base + '/dbmodel/syndb', {
+        projectId: Global.projectId,
         modelId: id,
         dbName: dbName
       });
@@ -158,7 +159,7 @@ layui.use(['layer', 'form', 'laypage'], function() {
             window.location.reload()
           }, 1000);
         } else {
-          layer.msg('同步数据表失败');
+          layer.msg(r.msg);
         }
       });
     });
@@ -180,7 +181,7 @@ layui.use(['layer', 'form', 'laypage'], function() {
       icon: 3, title:'生成代码', 
       content: genModule
     }, function(value, index){
-      var deferred = $.getJSON(Global.base + '/dbmodel/generate/' + id + '?genModule=' + $('input[name="genModule"]:checked').map(function(){return this.value}).get().join(','));
+      var deferred = $.getJSON(Global.base + '/dbmodel/generate/' + id + '?projectId=' + Global.projectId + '&genModule=' + $('input[name="genModule"]:checked').map(function(){return this.value}).get().join(','));
       $.when(deferred).done(function(r) {
         if(r.code == 0) {
           layer.msg('生成代码完成');
@@ -188,7 +189,7 @@ layui.use(['layer', 'form', 'laypage'], function() {
             window.location.reload()
           }, 1000);*/
         } else {
-          layer.msg('生成代码失败');
+          layer.msg(r.msg);
         }
       });
     });
@@ -214,11 +215,31 @@ layui.use(['layer', 'form', 'laypage'], function() {
             window.location.reload()
           }, 1000);
         } else {
-          layer.msg('生成代码失败');
+          layer.msg(r.msg);
         }
       });
     });
     return false;
+  });
+
+  // generateConfig
+  $('.generateConfig').on('click', function() {
+    var url = Global.base + '/dbmodel/generateConfig';
+    var data = {
+      projectId: Global.projectId,
+      dbName: $('input[name="dbName"]').val(),
+      rootPath: $('input[name="rootPath"]').val()
+    };
+    var deferred = $.getJSON(url, data);
+    $.when(deferred).done(function(result) {
+      if(result.code == 0) {
+        layer.msg('配置成功');
+      } else {
+        layer.msg(result.msg);
+      }
+    }).fail(function() {
+      layer.msg('Oop! 系统错误');
+    });
   });
 
 });

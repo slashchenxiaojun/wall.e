@@ -11,35 +11,15 @@ import org.hacker.mvc.model.DbModel;
 import org.hacker.mvc.model.DbModelItem;
 import org.hacker.mvc.model.DbModelMapping;
 import org.hacker.mvc.model.Generate;
+import org.hacker.mvc.model.Project;
 import org.hacker.service.TempletGenerate;
 
 import com.jfinal.aop.Before;
-import com.jfinal.kit.PropKit;
 import com.jfinal.kit.StrKit;
 import com.jfinal.plugin.activerecord.Db;
 import com.jfinal.plugin.activerecord.tx.Tx;
 
 public class DBModelController extends BaseController {
-	
-  private static String
-	generateRootPath,
-  generateConfigRootPath,
-  generateDbName,
-  dbName;
-	
-	private static TempletGenerate tg;
-	
-	static {
-	  PropKit.use("generate.properties");
-	  generateRootPath = PropKit.getProp("generate.properties").get("generateRootPath");
-	  generateConfigRootPath = PropKit.getProp("generate.properties").get("generateConfigRootPath");
-	  generateDbName = PropKit.getProp("generate.properties").get("generateDbName");
-	  
-	  tg = new TempletGenerate(
-	  generateRootPath, 
-	  generateConfigRootPath, 
-	  generateDbName);
-	}
 	
   public void index() {
 		Integer 
@@ -49,9 +29,30 @@ public class DBModelController extends BaseController {
 		
 		Assert.checkNotNull(projectId, "projectId");
 		setAttr("projectId", projectId);
-		setAttr("dbName", dbName);
+		// 工程id错误会抛出null异常
+		Project project = Project.dao.findById(projectId);
+		setAttr("dbName", project.getDbName());
+		setAttr("rootPath", project.getRootPath());
 		setAttr("dbmodels", DbModel.dao.paginate(pageNumber, pageSize, "select * ", "from w_db_model where project_id = ?", projectId));
 	}
+  
+  public void generateConfig() {
+    Object projectId = getPara("projectId");
+    String dbName    = getPara("dbName");
+    String rootPath  = getPara("rootPath");
+    
+    Assert.checkNotNull(projectId, "projectId");
+    Assert.checkNotNull(dbName, "dbName");
+    Assert.checkNotNull(rootPath, "rootPath");
+    
+    Project project = Project.dao.findById(projectId);
+    if (project == null) throw new ApiException(String.format("Oop! project[%s] not exits.", projectId));
+    project.setDbName(dbName);
+    project.setRootPath(rootPath);
+    if (!project.update())
+      throw new ApiException(String.format("Oop! project[%s] generate config fail.", projectId));
+    OK();
+  }
 	
 	public void create_model() {
 	  Object projectId = getPara("projectId");
@@ -91,38 +92,53 @@ public class DBModelController extends BaseController {
 	
 	// 生成sql并同步到数据库
 	public void syndb() {
+	  Object projectId = getPara("projectId");
 	  Object modelId = getPara("modelId");
 	  String dbName = getPara("dbName");
+	  
+	  Assert.checkNotNull(projectId, "projectId");
 	  Assert.checkNotNull(modelId, "modelId");
 	  Assert.checkNotNull(dbName, "dbName");
 	  
-	  DBModelController.dbName = dbName;
+	  Project project = Project.dao.findById(projectId);
+	  project.setDbName(dbName);
+	  project.update();
+	  
 	  DbModel model = DbModel.dao.findById(modelId);
+	  TempletGenerate tg = getTempletGenerate(projectId);
 	  tg.generateDB(model, null, dbName);
 	  OK();
 	}
 	
 	public void quickGenerate() {
-	   Object projectId = getPara();
-	   String dbName = getPara("dbName");
+	  Object projectId = getPara();
+	  String dbName = getPara("dbName");
 	   
-	   Assert.checkNotNull(projectId, "projectId");
-	   Assert.checkNotNull(dbName, "dbName");
+	  Assert.checkNotNull(projectId, "projectId");
+	  Assert.checkNotNull(dbName, "dbName");
 	   
-	   DBModelController.dbName = dbName;
-	   tg.quickGenerate(projectId, dbName);
-	   OK();
+    Project project = Project.dao.findById(projectId);
+    project.setDbName(dbName);
+    project.update();
+	    
+	  TempletGenerate tg = getTempletGenerate(projectId);
+	  tg.quickGenerate(projectId, dbName);
+	  OK();
 	}
 	
 	// 根据自定义的模板生成代码
 	public void generate() {
+	  Object projectId = getPara("projectId");
 	  Object modelId = getPara();
 	  String genModule = getPara("genModule");
+	  
+	  Assert.checkNotNull(projectId, "projectId");
 	  Assert.checkNotNull(modelId, "modelId");
 	  Assert.checkNotNull(genModule, "genModule");
 	  
 	  String[] genModules = genModule.split(",");
 	  DbModel model = DbModel.dao.findById(modelId);
+	  TempletGenerate tg = getTempletGenerate(projectId);
 	  Map<String, Object> paras = tg.getGenerateParamter(model, true);
 	  for (String module : genModules) {
 	    switch (module) {
@@ -284,4 +300,15 @@ public class DBModelController extends BaseController {
 		// qjd project: print_info.content varbinary(61800);
 		put("BLOB", "byte[]");
 	}};
+	
+	// 获取project生成代码的root路径-对应的模板对象
+	private TempletGenerate getTempletGenerate(Object projectId) {
+	  Project project = Project.dao.findById(projectId);
+	  if (project == null) throw new ApiException(String.format("Oop! project[%s] not exits.", projectId));
+	  String rootPath = project.getRootPath();
+	  if (StrKit.isBlank(rootPath)) throw new ApiException(String.format("Oop! project[%s] root path is null.", projectId));
+	  
+	  TempletGenerate tg = new TempletGenerate(rootPath, rootPath, null);
+	  return tg;
+	}
 }

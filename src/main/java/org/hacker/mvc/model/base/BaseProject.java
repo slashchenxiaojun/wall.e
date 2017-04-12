@@ -41,6 +41,22 @@ public abstract class BaseProject<M extends BaseProject<M>> extends BaseModel<M>
 		return get("base_url");
 	}
 
+	public void setDbName(java.lang.String dbName) {
+		set("db_name", dbName);
+	}
+
+	public java.lang.String getDbName() {
+		return get("db_name");
+	}
+
+	public void setRootPath(java.lang.String rootPath) {
+		set("root_path", rootPath);
+	}
+
+	public java.lang.String getRootPath() {
+		return get("root_path");
+	}
+
 	public void setCreateDate(java.util.Date createDate) {
 		set("create_date", createDate);
 	}

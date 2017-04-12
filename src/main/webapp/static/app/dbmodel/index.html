@@ -28,6 +28,15 @@
           <input type="text" name="dbName"  value="${dbName!''}" autocomplete="off" class="layui-input" placeholder="导入sql的数据库名称">
         </div>
         <div class="layui-input-inline">
+	        <label class="layui-form-label">rootPath</label>
+	        <div class="layui-input-inline">
+	          <input type="text" name="rootPath"  value="${rootPath!''}" autocomplete="off" class="layui-input" placeholder="生成代码的root路径">
+	        </div>
+	      </div>
+	      <div class="layui-input-inline">
+          <button class="layui-btn layui-btn-normal generateConfig">配置</button>
+        </div>
+        <div class="layui-input-inline">
           <button class="layui-btn layui-btn-danger quickGenerate">快速生成</button>
         </div>
       </div>

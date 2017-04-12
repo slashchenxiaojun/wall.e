@@ -29,7 +29,7 @@ public class _JFinalDemoGenerator {
 		// base model 所使用的包名
 		String baseModelPackageName = "org.hacker.mvc.model.base";
 		// base model 文件保存路径
-		String baseModelOutputDir = PathKit.getWebRootPath() + "/../src/org/hacker/mvc/model/base";
+		String baseModelOutputDir = PathKit.getWebRootPath() + "/src/main/java/org/hacker/mvc/model/base";
 		
 		// model 所使用的包名 (MappingKit 默认使用的包名)
 		String modelPackageName = "org.hacker.mvc.model";

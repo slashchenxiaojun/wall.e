@@ -42,7 +42,7 @@ public class TempletGenerate {
 	// 生成code文件目录的root-path
 	private String generateCodeRootPath;
 	// 生成config文件目录的root-path
-	private String generateConfigRootPath;
+//	private String generateConfigRootPath;
 	// 默认的生成数据库名为`walle`
 	private String generateDbName;
 	// 兼容maven beetl的基础路径,否则模板不能被正确识别
@@ -59,7 +59,7 @@ public class TempletGenerate {
 		gt = new GroupTemplate(resourceLoader, cfg);
 		
 		this.generateCodeRootPath = generateRootPath;
-		this.generateConfigRootPath = generateConfigRootPath;
+//		this.generateConfigRootPath = generateConfigRootPath;
 		this.generateDbName = generateDbName;
 		init();
 	}
@@ -339,7 +339,7 @@ public class TempletGenerate {
 	}
 	
 	protected File getConfigGenerateFile(String configPath, String fileName) {
-    File dir = new File(generateConfigRootPath + File.separator + configPath);
+    File dir = new File(generateCodeRootPath + File.separator + configPath);
     if(!dir.exists()) {
       if(!dir.mkdirs())
         throw new GenerateException("Oop~ generateFile mkdirs: " + dir.getAbsolutePath() + " fail.");

@@ -10,7 +10,7 @@ Target Server Type    : MYSQL
 Target Server Version : 50542
 File Encoding         : 65001
 
-Date: 2017-04-01 10:09:56
+Date: 2017-04-12 16:14:56
 */
 
 SET FOREIGN_KEY_CHECKS=0;
@@ -123,7 +123,7 @@ CREATE TABLE `w_interface` (
   KEY `fk_w_interface_w_folder1_idx` (`w_folder_id`),
   CONSTRAINT `fk_w_interface_w_folder1` FOREIGN KEY (`w_folder_id`) REFERENCES `w_folder` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_w_interface_w_project` FOREIGN KEY (`w_project_id`) REFERENCES `w_project` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8 COMMENT='接口是WALL-E的核心，所有接口都是归于某个项目，接口与项目是ManyToOne的关系，为什么不是ManyToMany，因为那样的话违反了DRY(Don''t repect yourself)原则';
+) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8 COMMENT='接口是WALL-E的核心，所有接口都是归于某个项目，接口与项目是ManyToOne的关系，为什么不是ManyToMany，因为那样的话违反了DRY(Don''t repect yourself)原则';
 
 -- ----------------------------
 -- Table structure for w_interface_log
@@ -168,10 +168,12 @@ CREATE TABLE `w_project` (
   `name` varchar(45) NOT NULL,
   `pattern` enum('normal','simulation') NOT NULL DEFAULT 'normal' COMMENT 'normal: 普通模式\nsimulation: 模拟模式\n\n模拟模式中会自动模拟数据生成给前期而不需要访问真实的接口\n',
   `base_url` varchar(45) NOT NULL COMMENT '项目的跟访问路径，这个选项是方便切换模式调试的开放人员可以不用改接口的地址',
+  `db_name` varchar(255) DEFAULT NULL COMMENT '生成工程的数据库名称(一般web工程都需要连接数据库)',
+  `root_path` varchar(255) DEFAULT NULL COMMENT '生成代码的root路径',
   `create_date` datetime DEFAULT NULL,
   `modify_date` datetime DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8 COMMENT='项目是承载api接口的载体，一个项目可以拥有多个接口';
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8 COMMENT='项目是承载api接口的载体，一个项目可以拥有多个接口';
 
 -- ----------------------------
 -- Table structure for w_result_data

@@ -17,6 +17,14 @@ public abstract class BaseResultData<M extends BaseResultData<M>> extends BaseMo
 		return get("id");
 	}
 
+	public void setName(java.lang.String name) {
+		set("name", name);
+	}
+
+	public java.lang.String getName() {
+		return get("name");
+	}
+
 	public void setValue(byte[] value) {
 		set("value", value);
 	}
@@ -25,20 +33,20 @@ public abstract class BaseResultData<M extends BaseResultData<M>> extends BaseMo
 		return get("value");
 	}
 
+	public void setType(java.lang.String type) {
+		set("type", type);
+	}
+
+	public java.lang.String getType() {
+		return get("type");
+	}
+
 	public void setWInterfaceId(java.lang.Integer wInterfaceId) {
 		set("w_interface_id", wInterfaceId);
 	}
 
 	public java.lang.Integer getWInterfaceId() {
 		return get("w_interface_id");
-	}
-
-	public void setWMetaDataId(java.lang.Integer wMetaDataId) {
-		set("w_meta_data_id", wMetaDataId);
-	}
-
-	public java.lang.Integer getWMetaDataId() {
-		return get("w_meta_data_id");
 	}
 
 }

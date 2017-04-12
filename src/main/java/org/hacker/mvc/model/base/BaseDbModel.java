@@ -57,11 +57,12 @@ public abstract class BaseDbModel<M extends BaseDbModel<M>> extends BaseModel<M>
 		return get("is_syn_code");
 	}
 
-	public void setProjectId(java.lang.Integer id) {
-	  set("project_id", id);
+	public void setProjectId(java.lang.Integer projectId) {
+		set("project_id", projectId);
 	}
 
 	public java.lang.Integer getProjectId() {
-	  return get("project_id");
+		return get("project_id");
 	}
+
 }
