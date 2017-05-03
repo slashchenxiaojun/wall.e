@@ -136,7 +136,7 @@ public class ${model.class_name} extends JPAModel<${model.class_name}> {
 
 @ }
 @ for(col in columns) {
-  public M set@print(camelNameConvert(col.name));
+  public ${model.class_name} set@print(camelNameConvert(col.name));
 (${col.java_type} ${col.name}) { return set("${col.name}", ${col.name}); }
 
 @ }
