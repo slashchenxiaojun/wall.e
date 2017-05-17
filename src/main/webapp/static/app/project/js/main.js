@@ -154,33 +154,56 @@ $(function() {
   };
 
   var zTreeOnClick = function(event, treeId, treeNode) {
-    if(treeNode.interface_id != null) {
+    if(treeNode.interface_id != null) { // get one interface
       $('#interface_tree').attr('folder-id', null);
       $('#interface_tree').attr('interface-id', treeNode.interface_id);
-    } else {
+      var intefaceId = $('#interface_tree').attr('interface-id');
+      $.when($.getJSON(Global.base + '/project/getInterface', {
+        'interface.id': intefaceId
+      })).done(function(r) {
+        if(r.code == 0) {
+          // 刷新table
+          renderInterfaceTable(r.data);
+        } else {
+          layer.msg('获取接口失败(' + r.msg + ')');
+        }
+      });
+    } else { // get all interface
       $('#interface_tree').attr('folder-id', treeNode.folder_id);
       $('#interface_tree').attr('interface-id', null);
+      var folderId = $('#interface_tree').attr('folder-id');
+      $.when($.getJSON(Global.base + '/project/getInterfaceByFolder', {
+        'project.id': $('body').attr('project-id'),
+        'folder.id': folderId,
+      })).done(function(r) {
+        if(r.code == 0) {
+          // 刷新table
+          renderInterfaceTable(r.data);
+        } else {
+          layer.msg('获取接口列表失败(' + r.msg + ')');
+        }
+      });
     }
-    
-    var folderId = $('#interface_tree').attr('folder-id');
-    $.when($.getJSON(Global.base + '/project/getInterfaceByFolder', {
-      'project.id': $('body').attr('project-id'),
-      'folder.id': folderId,
-    })).done(function(r) {
-      if(r.code == 0) {
-        // 刷新table
-        renderInterfaceTable(r.data);
-      } else {
-        layer.msg('获取接口列表失败(' + r.msg + ')');
-      }
-    });
   }
 
   var renderInterfaceTable = function(data) {
     $('.interfaceTable').html(null);
-    for (v in data) {
-      var interfaceNameAndCode = data[v].name + (data[v].code == null ? '' : ' (' + data[v].code + ')');
-      var tr = '<tr class="interface" data-id="' + data[v].id + '"><td><input type="checkbox"></td>'
+    if (Object.prototype.toString.call(data) == '[object Array]') {
+      for (v in data) {
+        var interfaceNameAndCode = data[v].name + (data[v].code == null ? '' : ' (' + data[v].code + ')');
+        var tr = '<tr class="interface" data-id="' + data[v].id + '"><td><input type="checkbox"></td>'
+        + '<td>' + interfaceNameAndCode + '</td>'
+        + '<td class="operation">'
+        + '<i class="layui-icon layui-anim layui-anim-rotate layui-anim-loop test">&#xe623;</i>' //
+        + '<i class="layui-icon setting">&#xe620;</i>'
+        + '<i class="layui-icon result">&#xe60e;</i>'
+        + '<i class="layui-icon simulation">&#xe60b;</i>'
+        + '</td></tr>';
+        $('.interfaceTable').append(tr);
+      }
+    } else {
+      var interfaceNameAndCode = data.name + (data.code == null ? '' : ' (' + data.code + ')');
+      var tr = '<tr class="interface" data-id="' + data.id + '"><td><input type="checkbox"></td>'
       + '<td>' + interfaceNameAndCode + '</td>'
       + '<td class="operation">'
       + '<i class="layui-icon layui-anim layui-anim-rotate layui-anim-loop test">&#xe623;</i>' //

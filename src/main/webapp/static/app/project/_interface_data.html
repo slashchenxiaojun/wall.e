@@ -23,16 +23,27 @@ strong {
 </style>
 </head>
 <body>
+
+
   <div class="alert alert-danger">
     <strong>Oh snap!</strong>
     <span>JSON GESH ERROR</span>
   </div>
   <form class="layui-form" style="padding: 20px 70px 0 40px;">
+    <div class="layui-tab layui-tab-brief" lay-filter="docDemoTabBrief">
+      <ul class="layui-tab-title">
+        <li>x-www-form-urlencoded</li>
+        <li class="layui-this">raw</li>
+        <li>binary</li>
+      </ul>
+      <div class="layui-tab-content"></div>
+    </div>
+
     <div class="layui-form-item">
       <label class="layui-form-label">接口模拟数据(JSON)</label>
       <div class="layui-input-block">
-        <input type="hidden" name="interface.id" class="layui-input" value="${interface.id}">
-        <input type="hidden" name="interface.code" class="layui-input" value="${interface.code}">
+        <input type="hidden" name="interface.id" class="layui-input" value="${interface.id!}">
+        <input type="hidden" name="interface.code" class="layui-input" value="${interface.code!}">
         <textarea name="interface.data" class="layui-textarea" style="height: 350px;">${interface.data}</textarea>
       </div>
     </div>

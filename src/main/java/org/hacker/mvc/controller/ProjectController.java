@@ -156,6 +156,14 @@ public class ProjectController extends BaseController {
 	  OK(Interface.dao.find("select * from w_interface where w_project_id = ? and  w_folder_id = ?", projectId, folderId));
 	}
 	
+	public void getInterface() {
+	  Integer interfaceId = getParaToInt("interface.id");
+	   
+	  checkNotNull(interfaceId, "interface.id");
+    
+	  OK(Interface.dao.findById(interfaceId));
+	}
+	 
 	// 快速创建接口
 	public void createInterfaceQuick() {
 	  Integer projectId = getParaToInt("project.id");
