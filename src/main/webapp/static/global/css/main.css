@@ -37,9 +37,7 @@
   background-size: cover;
   background-repeat: no-repeat;
   z-index: 99999;
-  position: absolute;
-  left: 35px;
-  top: 10px;
+  float: right;
 }
 .note {
   color: #c5c0c0;
@@ -62,3 +60,4 @@
 .create-folder {
   margin-top: 19px;
 }
+.clean { float: none; }

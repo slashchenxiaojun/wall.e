@@ -175,7 +175,10 @@ public class DBModelController extends BaseController {
 		if ( model == null ) throw new ApiException("Oop! model not exist.");
 
 		List<DbModelItem> dbModelItemList = DbModelItem.dao.find("select * from w_db_model_item where w_model_id = ?", modelId);
-		if ( !model.remove("id").save() ) throw new ApiException("Oop! clone model fail.");
+		model.remove("id").setName(model.getName() + "_clone");
+		model.setClassName(null);
+		model.setDescribe(null);
+		if ( !model.save() ) throw new ApiException("Oop! clone model fail.");
 		for (DbModelItem dbModelItem : dbModelItemList) {
 			dbModelItem.remove("id").setWModelId(model.getId());
 			dbModelItem.save();
@@ -183,6 +186,7 @@ public class DBModelController extends BaseController {
 		Generate generate = Generate.dao.findFirst("select * from w_generate where w_model_id = ?", modelId);
 		if ( generate != null) {
 			generate.remove("id").setWModelId(model.getId());
+			generate.setModuleName(null);
 			generate.save();
 		}
 		OK();

@@ -36,8 +36,7 @@
   background-size: cover;
   background-repeat: no-repeat;
   z-index: 99999;
-  position: absolute;
-  top: 10px;
+  float: right;
 }
 .genModule input {
   display: block;
@@ -46,7 +45,7 @@
   margin-right: 0.5rem
 }
 .layui-table td {
-  overflow: hidden;
+/* overflow: hidden; */
   text-overflow:ellipsis;
 /* white-space: nowrap; */
 }
