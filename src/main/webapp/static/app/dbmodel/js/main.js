@@ -196,6 +196,27 @@ layui.use(['layer', 'form', 'laypage'], function() {
     return false;
   });
 
+  // clone code
+  $('.clone-code').on('click', function(){
+    var id = $(this).attr('data-id');
+    layer.confirm('确定要复制该Model吗?', {
+      icon: 3, title:'复制Model'
+    }, function(value, index){
+      var deferred = $.getJSON(Global.base + '/dbmodel/cloneModel/' + id + '?projectId=' + Global.projectId);
+      $.when(deferred).done(function(r) {
+        if(r.code == 0) {
+          layer.msg('复制成功');
+          setTimeout(function(){
+            window.location.reload()
+          }, 1000);
+        } else {
+          layer.msg(r.msg);
+        }
+      });
+    });
+    return false;
+  });
+
   // quick generate
   $('.quickGenerate').on('click', function(){
     var dbName = $('input[name="dbName"]').val();

@@ -160,6 +160,33 @@ public class DBModelController extends BaseController {
 	  }
 	  OK();
 	}
+
+	// 复制model
+	@Before(Tx.class)
+	public void cloneModel() {
+		Object projectId = getPara("projectId");
+		Object modelId = getPara();
+
+		Assert.checkNotNull(projectId, "projectId");
+		Assert.checkNotNull(modelId, "modelId");
+
+		// 一共需要复制 model, model_item, generate
+		DbModel model = DbModel.dao.findById(modelId);
+		if ( model == null ) throw new ApiException("Oop! model not exist.");
+
+		List<DbModelItem> dbModelItemList = DbModelItem.dao.find("select * from w_db_model_item where w_model_id = ?", modelId);
+		if ( !model.remove("id").save() ) throw new ApiException("Oop! clone model fail.");
+		for (DbModelItem dbModelItem : dbModelItemList) {
+			dbModelItem.remove("id").setWModelId(model.getId());
+			dbModelItem.save();
+		}
+		Generate generate = Generate.dao.findFirst("select * from w_generate where w_model_id = ?", modelId);
+		if ( generate != null) {
+			generate.remove("id").setWModelId(model.getId());
+			generate.save();
+		}
+		OK();
+	}
 	
 	@Before(Tx.class)
 	public void save() {

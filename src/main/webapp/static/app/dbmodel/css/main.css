@@ -18,7 +18,7 @@
 .site-tree, .site-content {
   display: inline-block;
   vertical-align: top;
-  font-size: 14px;
+  font-size: 16px;
 }
 .site-block .layui-form {
   margin-right: 50px;
@@ -37,7 +37,6 @@
   background-repeat: no-repeat;
   z-index: 99999;
   position: absolute;
-  left: 35px;
   top: 10px;
 }
 .genModule input {
@@ -45,4 +44,9 @@
   float: left;
   margin-top: 0.4rem;
   margin-right: 0.5rem
+}
+.layui-table td {
+  overflow: hidden;
+  text-overflow:ellipsis;
+/* white-space: nowrap; */
 }
