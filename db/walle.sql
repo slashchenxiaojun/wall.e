@@ -1,16 +1,16 @@
 /*
 Navicat MySQL Data Transfer
 
-Source Server         : 本地localhost
-Source Server Version : 50542
-Source Host           : 127.0.0.1:3306
+Source Server         : 121.41.50.221
+Source Server Version : 50173
+Source Host           : 121.41.50.221:3306
 Source Database       : walle
 
 Target Server Type    : MYSQL
-Target Server Version : 50542
+Target Server Version : 50173
 File Encoding         : 65001
 
-Date: 2017-04-12 16:14:56
+Date: 2017-07-06 16:57:53
 */
 
 SET FOREIGN_KEY_CHECKS=0;
@@ -22,7 +22,7 @@ DROP TABLE IF EXISTS `w_db_model`;
 CREATE TABLE `w_db_model` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `name` varchar(45) NOT NULL COMMENT '表名',
-  `class_name` varchar(45) NOT NULL COMMENT '类名',
+  `class_name` varchar(45) DEFAULT NULL COMMENT '类名',
   `describe` varchar(100) DEFAULT NULL COMMENT '描述(表的注释)',
   `is_syn_db` bit(1) DEFAULT NULL COMMENT '是否已经同步数据库',
   `is_syn_code` bit(1) DEFAULT NULL COMMENT '是否同步代码',
@@ -30,7 +30,7 @@ CREATE TABLE `w_db_model` (
   PRIMARY KEY (`id`),
   KEY `fk_w_project_w_model1_idx` (`project_id`),
   CONSTRAINT `fk_w_project_w_model1_idx` FOREIGN KEY (`project_id`) REFERENCES `w_project` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB AUTO_INCREMENT=24 DEFAULT CHARSET=utf8 COMMENT='数据model元数据，通常使用engine为InnoDB\r\n\r\n';
+) ENGINE=InnoDB AUTO_INCREMENT=66 DEFAULT CHARSET=utf8 COMMENT='数据model元数据，通常使用engine为InnoDB\r\n\r\n';
 
 -- ----------------------------
 -- Table structure for w_db_model_item
@@ -53,7 +53,7 @@ CREATE TABLE `w_db_model_item` (
   PRIMARY KEY (`id`),
   KEY `fk_w_model_item_w_model1_idx` (`w_model_id`),
   CONSTRAINT `fk_w_model_item_w_model1` FOREIGN KEY (`w_model_id`) REFERENCES `w_db_model` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=137 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=932 DEFAULT CHARSET=utf8;
 
 -- ----------------------------
 -- Table structure for w_db_model_mapping
@@ -72,7 +72,7 @@ CREATE TABLE `w_db_model_mapping` (
   KEY `fk_w_model_mapping_w_db_model2_idx` (`slaves_id`),
   CONSTRAINT `fk_w_model_mapping_w_db_model1` FOREIGN KEY (`master_id`) REFERENCES `w_db_model` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_w_model_mapping_w_db_model2` FOREIGN KEY (`slaves_id`) REFERENCES `w_db_model` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=15 DEFAULT CHARSET=utf8;
 
 -- ----------------------------
 -- Table structure for w_folder
@@ -88,7 +88,7 @@ CREATE TABLE `w_folder` (
   PRIMARY KEY (`id`),
   KEY `fk_w_folder_w_project1_idx` (`w_project_id`),
   CONSTRAINT `fk_w_folder_w_project1` FOREIGN KEY (`w_project_id`) REFERENCES `w_project` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8 COMMENT='接口的文件夹-树形结构';
+) ENGINE=InnoDB AUTO_INCREMENT=12 DEFAULT CHARSET=utf8 COMMENT='接口的文件夹-树形结构';
 
 -- ----------------------------
 -- Table structure for w_generate
@@ -96,14 +96,15 @@ CREATE TABLE `w_folder` (
 DROP TABLE IF EXISTS `w_generate`;
 CREATE TABLE `w_generate` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `package` varchar(45) DEFAULT NULL COMMENT '包路径\n使用''.''来分割层级, 如\norg.hacker\n\n',
-  `module_name` varchar(45) DEFAULT NULL COMMENT '模块名称\n',
+  `package` varchar(45) DEFAULT NULL COMMENT '包路径使用''.''来分割层级, 如\norg.hacker\n\n',
+  `module_name` varchar(45) DEFAULT NULL COMMENT '模块名称',
+  `module_engine` varchar(45) DEFAULT NULL COMMENT '数据库引擎',
   `code_style` varchar(45) DEFAULT NULL COMMENT '代码风格',
   `w_model_id` int(11) NOT NULL,
   PRIMARY KEY (`id`),
   KEY `fk_w_generate_w_db_model1_idx` (`w_model_id`),
   CONSTRAINT `fk_w_generate_w_db_model1` FOREIGN KEY (`w_model_id`) REFERENCES `w_db_model` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=14 DEFAULT CHARSET=utf8 COMMENT='目录结构由 包路径 + 模块 构成';
+) ENGINE=InnoDB AUTO_INCREMENT=55 DEFAULT CHARSET=utf8 COMMENT='目录结构由 包路径 + 模块 构成';
 
 -- ----------------------------
 -- Table structure for w_interface
@@ -123,7 +124,7 @@ CREATE TABLE `w_interface` (
   KEY `fk_w_interface_w_folder1_idx` (`w_folder_id`),
   CONSTRAINT `fk_w_interface_w_folder1` FOREIGN KEY (`w_folder_id`) REFERENCES `w_folder` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_w_interface_w_project` FOREIGN KEY (`w_project_id`) REFERENCES `w_project` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8 COMMENT='接口是WALL-E的核心，所有接口都是归于某个项目，接口与项目是ManyToOne的关系，为什么不是ManyToMany，因为那样的话违反了DRY(Don''t repect yourself)原则';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='接口是WALL-E的核心，所有接口都是归于某个项目，接口与项目是ManyToOne的关系则';
 
 -- ----------------------------
 -- Table structure for w_interface_log
@@ -157,7 +158,7 @@ CREATE TABLE `w_parameter` (
   PRIMARY KEY (`id`),
   KEY `fk_w_parameter_w_interface1_idx` (`w_interface_id`),
   CONSTRAINT `fk_w_parameter_w_interface1` FOREIGN KEY (`w_interface_id`) REFERENCES `w_interface` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='接口的参数，与接口是oneToMany的关系，参数是为了满足前后端效验一致而产生的，最理想的情况是使用代码生成来降低容错率';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='接口的参数，与接口是oneToMany的关系，参数是为了满足前后端效验一致而产生的';
 
 -- ----------------------------
 -- Table structure for w_project
@@ -173,7 +174,7 @@ CREATE TABLE `w_project` (
   `create_date` datetime DEFAULT NULL,
   `modify_date` datetime DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8 COMMENT='项目是承载api接口的载体，一个项目可以拥有多个接口';
+) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8 COMMENT='项目是承载api接口的载体，一个项目可以拥有多个接口';
 
 -- ----------------------------
 -- Table structure for w_result_data

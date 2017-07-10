@@ -11,3 +11,9 @@ body {
 .slaves-select {
   display: none;
 }
+.module-engine .layui-form-select {
+  float: right;
+  width: 220px;
+  position: relative;
+  bottom: 8px;
+}

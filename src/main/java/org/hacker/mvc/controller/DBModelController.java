@@ -59,7 +59,7 @@ public class DBModelController extends BaseController {
     Assert.checkNotNull(projectId, "projectId");
     
     setAttr("projectId", projectId);
-		render("_create_modele.html");
+		render("_create_model.html");
 	}
 	
 	public void update_model() {
@@ -73,7 +73,7 @@ public class DBModelController extends BaseController {
 	  setAttr("model", DbModel.dao.findFirst("select * from w_db_model where id = ? and project_id = ?", modelId, projectId));
 	  setAttr("generate", DbModel.dao.findFirst("select * from w_generate where w_model_id = ?", modelId));
 	  setAttr("modelItem", DbModelItem.dao.find("select b.* from w_db_model a left join w_db_model_item b on a.id = b.w_model_id where a.id = ? order by b.serial asc", modelId));
-	  render("_update_modele.html");
+	  render("_update_model.html");
 	}
 	
 	public void mapping_model() {

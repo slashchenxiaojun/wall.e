@@ -125,13 +125,17 @@ public class TempletGenerate {
 //        foreign.add(mm);
 //      }
 //    }
-    
+
+    Generate generate = Generate.dao.findFirst("select * from w_generate where w_model_id = ?", id);
     Map<String, Object> paras = new HashMap<>();
     paras.put("db", dbName);
     paras.put("model", model);
     paras.put("columns", columns);
     
     paras.put("mapping", slaves);
+
+    // 添加生成信息
+    paras.put("generate", generate);
 //    paras.put("foreign", foreign);
     
     Template template = gt.getTemplate(templatePath);
