@@ -106,7 +106,7 @@
             <tbody class="model-form-item">
             @for (item in modelItem) {
             @if (item.name == "create_date" || item.name == "modify_date") continue;
-            <tr>
+            <tr draggable="true">
 						  <input type="hidden" name="model.serial" value="${item.serial}">
 						  <td>${item.serial}</td>
 						  <td>
@@ -209,7 +209,9 @@
   </td>
 </tr>
 </script>
+
 <script src="../static/module/jquery/jquery-1.9.1.min.js"></script>
+<script src="//apps.bdimg.com/libs/jqueryui/1.10.4/jquery-ui.min.js"></script>
 <script src="../static/module/layui/layui.js"></script>
 <script type="text/javascript">
 Global = {};
@@ -293,14 +295,24 @@ layui.use(['layer', 'form', 'element'], function() {
       return false;
     }
     $(this).parent().parent().remove();
-    tr_list = $('.model-form-item').children();
-    // 重构序列号
-    for(var i = 1; i <= tr_list.length; i++) {
-      var td = tr_list.eq(i - 1).children().eq(1);
-      td.html(i);
-    }
+    generateSeq();
   });
 
+  // 重构序列号
+  var generateSeq = function() {
+    var tr_list = $('.model-form-item').children();
+    // 重构序列号
+    for(var i = 1; i <= tr_list.length; i++) {
+      var td = tr_list.eq(i - 1).children();
+      td.eq(0).val(i);
+      td.eq(1).html(i);
+    }
+  }
+
+  // 拖拽事件
+  $( ".model-form-item" ).sortable();
+  $( ".model-form-item" ).draggable();
+  $( ".model-form-item tr" ).disableSelection();
 });
 </script>
 </html>
