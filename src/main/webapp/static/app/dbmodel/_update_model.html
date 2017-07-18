@@ -311,7 +311,9 @@ layui.use(['layer', 'form', 'element'], function() {
 
   // 拖拽事件
   $( ".model-form-item" ).sortable();
-  $( ".model-form-item" ).draggable();
+  $( ".model-form-item" ).draggable({
+    axis: "y"
+  });
   $( ".model-form-item tr" ).disableSelection();
 });
 </script>

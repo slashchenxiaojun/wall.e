@@ -4,6 +4,7 @@ import static org.hacker.module.common.Assert.checkNotNull;
 
 import java.util.List;
 
+import com.alibaba.fastjson.JSON;
 import org.hacker.core.BaseController;
 import org.hacker.exception.ApiException;
 import org.hacker.mvc.model.Folder;
@@ -280,9 +281,19 @@ public class ProjectController extends BaseController {
     if (interfaces.get("data") == null) {
       Error(500, "Oop! interface data not exist."); return;
     }
+    // 使用baseUrl瓶装真实的接口url
+		if ( !url.startsWith("http")) {
+    	String baseUrl = Project.dao.findById(interfaces.getWProjectId()).getBaseUrl();
+    	if ( StrKit.notBlank(baseUrl) ) {
+    		if ( url.startsWith("/"))
+					url = baseUrl + url;
+    		else
+					url = baseUrl + "/" + url;
+			}
+		}
     String result = HttpKit.post(url, interfaces.get("data").toString());
-    LOG.debug(String.format("ID[%n]-interface:[%s (%s)] invoke result:[%s]", interfaces.getId(), interfaces.getName(), interfaces.getCode(), result));
-    OK();
+    LOG.info(String.format("ID[%n]-interface:[%s (%s)] invoke result:[%s]", interfaces.getId(), interfaces.getName(), interfaces.getCode(), result));
+    OK(JSON.parse(result));
 	}
 	
 	/**
