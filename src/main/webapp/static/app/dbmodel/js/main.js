@@ -6,6 +6,10 @@ layui.use(['layer', 'form', 'laypage'], function() {
   laypage = layui.laypage,
   layer = layui.layer;
 
+  $('.walle').on('click', function() {
+    window.location.href = Global.base + '/project' + window.location.search;
+  });
+
   laypage({
 	  cont: 'paginate',
 	  pages: $('#paginate').attr('page'),

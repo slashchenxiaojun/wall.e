@@ -8,6 +8,9 @@ layui.use(['layer', 'form'], function() {
   // 使用 form 作为全局对象，ztree代码需要使用
   form = layui.form();
   layer.msg('Welcome use wall.e');
+  $('.walle').on('click', function() {
+    window.location.href = Global.base + '/dbmodel' + window.location.search;
+  });
 
   // ---------init---------
   // 获取project的pattern

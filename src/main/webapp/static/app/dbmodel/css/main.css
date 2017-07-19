@@ -37,6 +37,7 @@
   background-repeat: no-repeat;
   z-index: 99999;
   float: right;
+  cursor:pointer;
 }
 .genModule input {
   display: block;
