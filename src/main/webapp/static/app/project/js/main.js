@@ -59,7 +59,9 @@ layui.use(['layer', 'form'], function() {
 $(function() {
   var zTreeObj;
   // 通过url判断
-  var project_id = window.location.search.substr('?projectId='.length);
+  // 返回projectId=x
+  var project_id = window.location.search.substr(1).split('&').find( function(e) { e = e.split('=')[0]; return e === 'projectId'} );
+  project_id = project_id.split('=')[1];
   if (project_id == undefined) project_id = 1;
   $('body').attr('project-id', project_id);
   
