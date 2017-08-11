@@ -21,8 +21,10 @@ CREATE TABLE `${db}`.`${model.name}` (
 @		var value = "";
 @		if(isEmpty(col.default_value)) {
 @			value = "NULL";
-@		} else if(col.type == "BIT") {
+@		} else if(col.type == "BIT" && col.default_value == "0") {
 @			value = "b'0'";
+@		} else if(col.type == "BIT" && col.default_value == "1") {
+@     value = "b'1'";
 @		} else if(col.type == "INTEGER" || col.type == "BIGINT") {
 @			value = col.default_value;
 @		} else if(col.type == "VARCHAR") {
