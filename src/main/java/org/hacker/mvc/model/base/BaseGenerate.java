@@ -33,6 +33,14 @@ public abstract class BaseGenerate<M extends BaseGenerate<M>> extends BaseModel<
 		return get("module_name");
 	}
 
+	public void setModuleEngine(java.lang.String moduleEngine) {
+		set("module_engine", moduleEngine);
+	}
+
+	public java.lang.String getModuleEngine() {
+		return get("module_engine");
+	}
+
 	public void setCodeStyle(java.lang.String codeStyle) {
 		set("code_style", codeStyle);
 	}

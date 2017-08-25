@@ -4,67 +4,227 @@
 <meta charset="UTF-8">
 <title>Wall.E Edit Interface</title>
 <link href="${base}/static/module/layui/css/layui.css" rel="stylesheet">
+<style>
+.alert-danger {
+  color: #a94442;
+  background-color: #f2dede;
+  border-color: #ebccd1;
+}
+.alert {
+  padding: 15px;
+  margin: 10px 70px 0 65px;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  display: none;
+}
+strong {
+  font-weight: 700;
+}
+i {
+  cursor:pointer;
+}
+</style>
 </head>
 <body>
-  <form class="layui-form" style="padding: 20px 70px 0 40px;">
-    <div class="layui-form-item">
-      <label class="layui-form-label">接口名称</label>
-      <label class="layui-form-label" style="padding-left: 0px;text-align: left;width: 78%;">${interface.name}</label>
-      <div class="layui-input-block">
-        <input type="hidden" name="interface.id" class="layui-input" value="${interface.id}">
-        <input type="hidden" name="interface.name" class="layui-input" value="${interface.name}">
-      </div>
-    </div>
+  <div class="layui-tab layui-tab-brief">
+    <ul class="layui-tab-title">
+      <li class="layui-this">接口配置</li>
+      <li>参数配置</li>
+      <li>模拟响应值</li>
+    </ul>
+    <div class="layui-tab-content">
+      <div class="layui-tab-item layui-show">
+        <form class="layui-form" style="padding: 20px 70px 0 40px;">
+          <div class="layui-form-item">
+            <label class="layui-form-label">接口名称</label>
+            <label class="layui-form-label" style="padding-left: 0px;text-align: left;width: 78%;">${interface.name}</label>
+            <div class="layui-input-block">
+              <input type="hidden" name="project.id" class="layui-input">
+              <input type="hidden" name="interface.id" class="layui-input" value="${interface.id}">
+              <input type="hidden" name="interface.name" class="layui-input" value="${interface.name}">
+            </div>
+          </div>
 
-    <div class="layui-form-item">
-      <label class="layui-form-label">接口Code</label>
-      <div class="layui-input-block">
-        <input type="text" name="interface.code" class="layui-input" value="${interface.code}">
-      </div>
-    </div>
+          <div class="layui-form-item">
+            <label class="layui-form-label">接口Code</label>
+            <div class="layui-input-block">
+              <input type="text" name="interface.code" class="layui-input" value="${interface.code}">
+            </div>
+          </div>
 
-    <div class="layui-form-item">
-      <label class="layui-form-label">接口地址</label>
-      <div class="layui-input-block">
-        <input type="text" name="interface.relative_url" class="layui-input" value="${interface.relative_url}">
-      </div>
-    </div>
+          <div class="layui-form-item">
+            <label class="layui-form-label">接口地址</label>
+            <div class="layui-input-block">
+              <input type="text" name="interface.relative_url" class="layui-input" value="${interface.relative_url}">
+            </div>
+          </div>
 
-    <div class="layui-form-item">
-      <label class="layui-form-label">接口描述</label>
-      <div class="layui-input-block">
-        <textarea name="interface.description" class="layui-textarea">${interface.description}</textarea>
+          <div class="layui-form-item">
+            <label class="layui-form-label">接口描述</label>
+            <div class="layui-input-block">
+              <textarea name="interface.description" class="layui-textarea">${interface.description}</textarea>
+            </div>
+          </div>
+        </form>
       </div>
-    </div>
+      <div class="layui-tab-item ">
+        <form class="layui-form">
+          <button class="layui-btn layui-btn-small layui-btn-normal create-form">添加参数</button>
+          <table class="layui-table">
+            <colgroup>
+              <col width="10">
+              <col width="200">
+              <col width="200">
+              <col width="200">
+              <col width="200">
+              <col width="70">
+              <col width="70">
+              <col width="80">
+              <col width="10">
+            </colgroup>
+            <thead>
+            <tr>
+              <th>序号</th>
+              <th>名称</th>
+              <th>描述</th>
+              <th>类型</th>
+              <th>类型补充(enum & array)</th>
+              <th>大小</th>
+              <th>特殊格式</th>
+              <th>非空</th>
+              <th>操作</th>
+            </tr>
+            </thead>
+            <tbody class="param-form-item">
+            @ for( p in paramList ) {
+            <tr>
+              <input type="hidden" name="param.seq" value="${pLP.index}">
+              <td>${pLP.index}</td>
+              <td>
+                <input name="param.name" type="text" placeholder="" class="layui-input" value="${p.name}">
+              </td>
+              <td>
+                <input name="param.remarks" type="text" placeholder="" class="layui-input" value="${p.remarks}">
+              </td>
+              <td>
+                <select name="param.type" lay-verify="required" lay-filter="param_type">
+                  <option value="">参数类型</option>
+                  <optgroup label="字符类型">
+                    <option value="String" @if (p.type == "string") { print("selected"); }
+                    >String</option>
+                  </optgroup>
+                  <optgroup label="枚举类型">
+                    <option value="Enum" @if (p.type == "enum") { print("selected"); }
+                    >Enum</option>
+                  </optgroup>
+                  <optgroup label="数值类型">
+                    <option value="Number" @if (p.type == "number") { print("selected"); }
+                    >Number</option>
+                  </optgroup>
+                  <optgroup label="布尔类型">
+                    <option value="Boolean" @if (p.type == "boolean") { print("selected"); }
+                    >Boolean</option>
+                  </optgroup>
+                  <optgroup label="日期类型">
+                    <option value="Date" @if (p.type == "date") { print("selected"); }
+                    >Date(java.util.Date)</option>
+                  </optgroup>
+                  <optgroup label="对象类型">
+                    <option value="Object" @if (p.type == "object") { print("selected"); }
+                    >Object(com.alibaba.fastjson.JSONObject)</option>
+                  </optgroup>
+                  <optgroup label="数组类型">
+                    <option value="Array" @if (p.type == "array") { print("selected"); }
+                    >Array(java.util.List)</option>
+                  </optgroup>
+                </select>
+              </td>
+              <td>
+                <input name="extend" type="text" placeholder="" class="layui-input" value="@if(p.type == "enum") { print(p.enum_value); } else if ( p.type == "object" || p.type == "array" ) { print(p.array_type); }
+                ">
+                <input name="param.array_type" type="hidden" value="${p.array_type}">
+                <input name="param.enum_value" type="hidden" value="${p.enum_value}">
+              </td>
+              <td>
+                <input name="param.max" type="text" placeholder="" class="layui-input" value="${p.max}">
+              </td>
+              <td>
+                <input name="model.format" type="text" placeholder="" class="layui-input" value="${p.format}">
+              </td>
+              <td>
+                <input name="param.require" type="hidden">
+                <input type="checkbox" placeholder="" class="layui-input" lay-skin="switch" lay-filter="required" @if(p.require == true) { print("checked"); }
+                >
+              </td>
+              <td>
+                <button class="layui-btn layui-btn-small layui-btn-danger delete-form">删除</button>
+              </td>
+            </tr>
+            @ }
+            </tbody>
+          </table>
+        </form>
+      </div>
+      <div class="layui-tab-item ">
+        <div class="alert alert-danger">
+          <strong>Oh snap!</strong>
+          <span>JSON GESH ERROR</span>
+        </div>
+        <form class="layui-form" style="padding: 20px 70px 0 40px;">
+          <div class="layui-form-item">
+            <label class="layui-form-label">接口模拟数据(JSON)</label>
+            <div class="layui-input-block">
+              <input type="hidden" name="interface.id" class="layui-input" value="${interface.id}">
+              <input type="hidden" name="interface.code" class="layui-input" value="${interface.code}">
+              <textarea name="interface.data" class="layui-textarea" style="height: 350px;">${interface.data}</textarea>
+            </div>
+          </div>
 
-    <div class="layui-form-item">
-      <div class="layui-input-block">
-        <button class="layui-btn save">保存</button>
-        <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+          <div class="layui-form-item">
+            <div class="layui-input-block">
+              <button class="layui-btn layui-btn-primary format-json">JSON格式化</button>
+            </div>
+          </div>
+        </form>
       </div>
     </div>
-  </form>
-</body>
-<script src="${base}/static/module/jquery/jquery-1.9.1.min.js"></script>
-<script src="${base}/static/module/layui/layui.js"></script>
-<script type="text/javascript">
-Global = {};
-Global.base = '${base}';
-var index = parent.layer.getFrameIndex(window.name);
-var projectId = window.location.search.substring('?projectId='.length, window.location.search.indexOf('&'));
-$('.save').on('click', function(e) {
-  e.preventDefault();
-  var url = Global.base + '/project/saveInterface';
-  var data = $('form').serialize() + '&project.id=' + projectId;
-  $.when($.getJSON(url, data)).
-  done(function(r) {
-    if (r.code != 0) {
-      parent.layer.msg(r.msg);
-    } else {
-      parent.layer.close(index);
-      parent.layer.msg('保存成功');
-    }
-  });
-});
+  </div>
+  
+<script type="text/html" id="param-item">
+  <tr>
+    <input type="hidden" name="param.seq" value="SERIAL">
+    <td>SERIAL</td>
+    <td>
+      <input name="param.name" type="text" placeholder="" class="layui-input">
+    </td>
+    <td>
+      <input name="param.remarks" type="text" placeholder="" class="layui-input">
+    </td>
+    <td>
+      @include("_interface_param_type_select.html") {}
+    </td>
+    <td>
+      <input name="extend" type="text" placeholder="" class="layui-input">
+      <input name="param.array_type" type="hidden">
+      <input name="param.enum_value" type="hidden">
+    </td>
+    <td>
+      <input name="param.max" type="text" placeholder="" class="layui-input">
+    </td>
+    <td>
+      <input name="model.format" type="text" placeholder="" class="layui-input">
+    </td>
+    <td>
+      <input name="param.require" type="hidden">
+      <input type="checkbox" placeholder="" class="layui-input" lay-skin="switch" lay-filter="required">
+    </td>
+    <td>
+      <button class="layui-btn layui-btn-small layui-btn-danger delete-form">删除</button>
+    </td>
+  </tr>
 </script>
+<script src="${base}/static/module/layui/layui.js"></script>
+<script src="${base}/static/global/js/global.js"></script>
+<script src="${base}/static/app/project/js/interface.js"></script>
+</body>
 </html>

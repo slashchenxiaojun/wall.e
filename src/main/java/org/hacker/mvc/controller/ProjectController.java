@@ -5,10 +5,14 @@ import static org.hacker.module.common.Assert.checkNotNull;
 import java.util.List;
 
 import com.alibaba.fastjson.JSON;
+import com.jfinal.aop.Before;
+import com.jfinal.plugin.activerecord.Db;
+import com.jfinal.plugin.activerecord.tx.Tx;
 import org.hacker.core.BaseController;
 import org.hacker.exception.ApiException;
 import org.hacker.mvc.model.Folder;
 import org.hacker.mvc.model.Interface;
+import org.hacker.mvc.model.Parameter;
 import org.hacker.mvc.model.Project;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -197,6 +201,7 @@ public class ProjectController extends BaseController {
 	public void interfaceForm() {
 	  Integer interfaceId = getParaToInt("interfaceId");
 	  setAttr("interface", Interface.dao.findById(interfaceId));
+		setAttr("paramList", Parameter.dao.find("SELECT * FROM w_parameter WHERE w_interface_id = ?", interfaceId));
 	  render("_interface_form.html");
 	}
 	
@@ -211,20 +216,34 @@ public class ProjectController extends BaseController {
     setAttr("interface", Interface.dao.findById(interfaceId));
     render("_interface_simulation_data.html");
   }
-  
+
+  @Before(Tx.class)
 	public void saveInterface() {
 	  Integer projectId = getParaToInt("project.id");
 	  Interface interfaces = getModel(Interface.class, "interface");
-	  
+	  List<Parameter> parameterList = getModels(Parameter.class, "param");
+
 	  checkNotNull(projectId, "project.id");
 	  checkNotNull(interfaces.getCode(), "interface.code");
 	  
 	  boolean create = interfaces.getId() == null;
 	  if (create) {
-	    throw new ApiException("Oop! interfaces id is null");
+			interfaces.save();
+			for (Parameter parameter : parameterList) {
+				parameter.setWInterfaceId(interfaces.getId());
+				parameter.save();
+			}
+//	    throw new ApiException("Oop! interfaces id is null");
 	  } else {
 	    checkSameInterfaceCode(projectId, interfaces.getCode(), interfaces.getId());
-	    if (interfaces.update()) OK();
+	    if (interfaces.update()) {
+				Db.update("DELETE FROM w_parameter WHERE w_interface_id = ?", interfaces.getId());
+				for (Parameter parameter : parameterList) {
+					parameter.setWInterfaceId(interfaces.getId());
+					parameter.save();
+				}
+	    	OK();
+			}
 	    else Error(500, "Oop! save interface fail.");
 	  }
 	}

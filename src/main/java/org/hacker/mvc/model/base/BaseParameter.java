@@ -33,12 +33,20 @@ public abstract class BaseParameter<M extends BaseParameter<M>> extends BaseMode
 		return get("type");
 	}
 
-	public void setRequire(java.lang.Boolean require) {
-		set("require", require);
+	public void setMin(java.lang.String min) {
+		set("min", min);
 	}
 
-	public java.lang.Boolean getRequire() {
-		return get("require");
+	public java.lang.String getMin() {
+		return get("min");
+	}
+
+	public void setMax(java.lang.String max) {
+		set("max", max);
+	}
+
+	public java.lang.String getMax() {
+		return get("max");
 	}
 
 	public void setFormat(java.lang.String format) {
@@ -57,12 +65,44 @@ public abstract class BaseParameter<M extends BaseParameter<M>> extends BaseMode
 		return get("length");
 	}
 
+	public void setRequire(java.lang.Boolean require) {
+		set("require", require);
+	}
+
+	public java.lang.Boolean getRequire() {
+		return get("require");
+	}
+
 	public void setRemarks(java.lang.String remarks) {
 		set("remarks", remarks);
 	}
 
 	public java.lang.String getRemarks() {
 		return get("remarks");
+	}
+
+	public void setArrayType(java.lang.String arrayType) {
+		set("array_type", arrayType);
+	}
+
+	public java.lang.String getArrayType() {
+		return get("array_type");
+	}
+
+	public void setEnumValue(java.lang.String enumValue) {
+		set("enum_value", enumValue);
+	}
+
+	public java.lang.String getEnumValue() {
+		return get("enum_value");
+	}
+
+	public void setSeq(java.lang.Integer seq) {
+		set("seq", seq);
+	}
+
+	public java.lang.Integer getSeq() {
+		return get("seq");
 	}
 
 	public void setWInterfaceId(java.lang.Integer wInterfaceId) {

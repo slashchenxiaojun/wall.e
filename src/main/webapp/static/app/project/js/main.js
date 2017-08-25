@@ -114,13 +114,39 @@ $(function() {
   
   $(document).on('click', '.setting', function(e){
     var interfaceId = $(this).parent().parent().attr('data-id');
-    layer.open({
+    var settingIndex = layer.open({
       type: 2,
-      area: ['700px', '530px'],
+      area: ['1024px', '650px'],
+      btn: ['保存', '关闭'],
       fixed: false, //不固定
       maxmin: true,
-      content: Global.base + '/project/interfaceForm?projectId=' + $('body').attr('project-id') + '&interfaceId=' + interfaceId
+      content: Global.base + '/project/interfaceForm?projectId=' + $('body').attr('project-id') + '&interfaceId=' + interfaceId,
+      yes: function(index, dlayer) {
+        // 获取表单信息提交
+        var doc = dlayer.find('iframe')[0].contentWindow.document;
+        // 过滤input[type=checkbox].value
+        var data = $(doc).find('form').serialize();
+        var url = Global.base + '/project/saveInterface';
+        var deferred = $.getJSON(url, data);
+        $.when(deferred).done(function(result) {
+          if(result.code == 0) {
+            layer.close(settingIndex);
+            layer.msg('OK');
+          } else {
+            layer.msg(result.msg);
+          }
+        }).fail(function() {
+          layer.msg('Oop! 系统错误');
+        });
+      }
     });
+//    layer.open({
+//      type: 2,
+//      area: ['700px', '530px'],
+//      fixed: false, //不固定
+//      maxmin: true,
+//      content: Global.base + '/project/interfaceForm?projectId=' + $('body').attr('project-id') + '&interfaceId=' + interfaceId
+//    });
   });
 
   $(document).on('click', '.result', function(e){
@@ -201,8 +227,8 @@ $(function() {
         + '<td class="operation">'
         + '<i class="layui-icon layui-anim layui-anim-rotate layui-anim-loop test">&#xe623;</i>' //
         + '<i class="layui-icon setting">&#xe620;</i>'
-        + '<i class="layui-icon result">&#xe60e;</i>'
-        + '<i class="layui-icon simulation">&#xe60b;</i>'
+//        + '<i class="layui-icon result">&#xe60e;</i>'
+//        + '<i class="layui-icon simulation">&#xe60b;</i>'
         + '</td></tr>';
         $('.interfaceTable').append(tr);
       }

@@ -331,7 +331,7 @@ public class DBModelController extends BaseController {
 		// qjd project: print_info.content varbinary(61800);
 		put("BLOB", "byte[]");
 	}};
-	
+
 	// 获取project生成代码的root路径-对应的模板对象
 	private TempletGenerate getTempletGenerate(Object projectId) {
 	  Project project = Project.dao.findById(projectId);
