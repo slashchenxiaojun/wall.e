@@ -222,6 +222,8 @@ $(function() {
     if (Object.prototype.toString.call(data) == '[object Array]') {
       for (v in data) {
         var interfaceNameAndCode = data[v].name + (data[v].code == null ? '' : ' (' + data[v].code + ')');
+        // 排序号
+//         + " ----- " + ( data[v].seq == null ? '0' : data[v].seq );
         var tr = '<tr class="interface" data-id="' + data[v].id + '"><td><input type="checkbox"></td>'
         + '<td>' + interfaceNameAndCode + '</td>'
         + '<td class="operation">'

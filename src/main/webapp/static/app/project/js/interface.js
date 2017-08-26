@@ -40,27 +40,27 @@ layui.use(['layer', 'form', 'element'], function() {
     // 特殊格式
     var format = td.next().next().next().children();
     if(data.value == 'String') {
-      enabled([max, format]);
-      disabled(extend);
+      // enabled([max, format]);
+      // disabled(extend);
       max.val(64);
     } else if(data.value == 'Enum') {
-      enabled(extend);
-      disabled([max, format]);
+      // enabled(extend);
+      // disabled([max, format]);
     } else if(data.value == 'Number') {
-      enabled([max, format]);
-      disabled(extend);
+      // enabled([max, format]);
+      // disabled(extend);
       // 32位整理最大值
       max.val(2147483647);
     } else if(data.value == 'Boolean') {
-      disabled([max, format, extend]);
+      // disabled([max, format, extend]);
     } else if(data.value == 'Date') {
-      disabled([max, format, extend]);
+      // disabled([max, format, extend]);
     } else if(data.value == 'Object') {
-      enabled(extend);
-      disabled([max, format]);
+      // enabled(extend);
+      // disabled([max, format]);
     } else if(data.value == 'Array') {
-      enabled(extend);
-      disabled([max, format]);
+      // enabled(extend);
+      // disabled([max, format]);
     }
     form.render();
   });
@@ -115,7 +115,7 @@ layui.use(['layer', 'form', 'element'], function() {
     var format = null;
     try {
       format = parent.formatJson(json);
-      $('textarea').val(format.substr(1));
+      $('textarea[name="interface.data"]').val(format.substr(1));
     } catch(e) {
       showError(e);
     }
@@ -141,5 +141,31 @@ layui.use(['layer', 'form', 'element'], function() {
   var hideError = function() {
     $('.alert-danger').hide();
   }
+
+  // 拖拽事件
+  $( ".param-form-item" ).sortable();
+  $( ".param-form-item" ).draggable({
+    axis: "y"
+  });
+  $( ".param-form-item tr" ).disableSelection();
+
+  // 生成json模板的数据
+  var temp_data = {
+    'page_temp': '{\
+                    "totalRow": 100,\
+                    "totalPage": 10,\
+                    "pageSize": 10,\
+                    "pageNumber": 1,\
+                    "list": [\
+                    ]\
+                  }'
+  };
+  // ----- 生成JSON result模板代码
+  $('.gen_json_temp').on('click', function() {
+    var temp = $('select[name="select_json_temp"]').val();
+    // 根据模板获取JSON数据
+    $('textarea[name="interface.data"]').val(temp_data[temp]);
+    return false;
+  });
 
 });

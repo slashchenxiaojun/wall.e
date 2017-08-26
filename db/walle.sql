@@ -10,7 +10,7 @@ Target Server Type    : MYSQL
 Target Server Version : 50173
 File Encoding         : 65001
 
-Date: 2017-08-25 11:47:52
+Date: 2017-08-25 17:09:21
 */
 
 SET FOREIGN_KEY_CHECKS=0;
@@ -88,7 +88,7 @@ CREATE TABLE `w_folder` (
   PRIMARY KEY (`id`),
   KEY `fk_w_folder_w_project1_idx` (`w_project_id`),
   CONSTRAINT `fk_w_folder_w_project1` FOREIGN KEY (`w_project_id`) REFERENCES `w_project` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB AUTO_INCREMENT=17 DEFAULT CHARSET=utf8 COMMENT='接口的文件夹-树形结构';
+) ENGINE=InnoDB AUTO_INCREMENT=18 DEFAULT CHARSET=utf8 COMMENT='接口的文件夹-树形结构';
 
 -- ----------------------------
 -- Table structure for w_generate
@@ -117,6 +117,7 @@ CREATE TABLE `w_interface` (
   `relative_url` varchar(100) DEFAULT NULL COMMENT '访问接口的真实地址,相对于项目的base_url而言',
   `description` varchar(500) DEFAULT NULL,
   `data` varchar(1000) DEFAULT NULL COMMENT '模拟数据',
+  `seq` int(11) DEFAULT NULL,
   `w_project_id` int(11) NOT NULL,
   `w_folder_id` int(11) NOT NULL,
   PRIMARY KEY (`id`),
@@ -124,7 +125,7 @@ CREATE TABLE `w_interface` (
   KEY `fk_w_interface_w_folder1_idx` (`w_folder_id`),
   CONSTRAINT `fk_w_interface_w_folder1` FOREIGN KEY (`w_folder_id`) REFERENCES `w_folder` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_w_interface_w_project` FOREIGN KEY (`w_project_id`) REFERENCES `w_project` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8 COMMENT='接口是WALL-E的核心，所有接口都是归于某个项目，接口与项目是ManyToOne的关系则';
+) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8 COMMENT='接口是WALL-E的核心，所有接口都是归于某个项目，接口与项目是ManyToOne的关系则';
 
 -- ----------------------------
 -- Table structure for w_interface_log
@@ -149,21 +150,21 @@ DROP TABLE IF EXISTS `w_parameter`;
 CREATE TABLE `w_parameter` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `name` varchar(45) NOT NULL,
-  `type` enum('enum','boolean','numbe','date','string','byte','object','array') NOT NULL DEFAULT 'string' COMMENT '对应java中的关系\nbool: boolen\nnumber: int, long, flow, double, BigDecimal\ndate: java.util.date\nstring: string\nbyte: object\njsonobj: jsonObject\njsonarray: jsonArray\n''bool'',''numbe'',''date'',''string'',''byte''',
+  `type` enum('enum','boolean','number','date','string','byte','object','array') NOT NULL DEFAULT 'string' COMMENT '对应java中的关系\nbool: boolen\nnumber: int, long, flow, double, BigDecimal\ndate: java.util.date\nstring: string\nbyte: object\njsonobj: jsonObject\njsonarray: jsonArray\n''bool'',''numbe'',''date'',''string'',''byte''',
   `min` varchar(45) DEFAULT '0',
   `max` varchar(45) DEFAULT NULL,
   `format` varchar(45) DEFAULT NULL COMMENT 'format是存在于当type=''date''\n相当于时间格式yyyy-MM-dd hh:mm:ss\n或者是其他的格式，可用于扩展',
   `length` varchar(45) DEFAULT NULL COMMENT '当type=''string''\n效验string的长度',
   `require` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否是必须填写的字段',
   `remarks` varchar(255) DEFAULT NULL COMMENT '参数备注',
-  `array_type` enum('enum','boolean','numbe','date','string','object','array') DEFAULT 'string' COMMENT '当type=jsonarray时，泛型的类型',
+  `array_type` enum('enum','boolean','number','date','string','object','array') DEFAULT 'string' COMMENT '当type=jsonarray时，泛型的类型',
   `enum_value` varchar(1000) DEFAULT NULL COMMENT '当type=enum时，枚举的值使用`,`相隔',
   `seq` int(255) DEFAULT NULL COMMENT '排序号',
   `w_interface_id` int(11) NOT NULL,
   PRIMARY KEY (`id`),
   KEY `fk_w_parameter_w_interface1_idx` (`w_interface_id`),
   CONSTRAINT `fk_w_parameter_w_interface1` FOREIGN KEY (`w_interface_id`) REFERENCES `w_interface` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8 COMMENT='接口的参数，与接口是oneToMany的关系，参数是为了满足前后端效验一致而产生的';
+) ENGINE=InnoDB AUTO_INCREMENT=29 DEFAULT CHARSET=utf8 COMMENT='接口的参数，与接口是oneToMany的关系，参数是为了满足前后端效验一致而产生的';
 
 -- ----------------------------
 -- Table structure for w_project

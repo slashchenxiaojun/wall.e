@@ -46,7 +46,7 @@ i {
           </div>
 
           <div class="layui-form-item">
-            <label class="layui-form-label">接口Code</label>
+            <label class="layui-form-label">接口标识</label>
             <div class="layui-input-block">
               <input type="text" name="interface.code" class="layui-input" value="${interface.code}">
             </div>
@@ -63,6 +63,13 @@ i {
             <label class="layui-form-label">接口描述</label>
             <div class="layui-input-block">
               <textarea name="interface.description" class="layui-textarea">${interface.description}</textarea>
+            </div>
+          </div>
+
+          <div class="layui-form-item">
+            <label class="layui-form-label">排序号</label>
+            <div class="layui-input-block">
+              <input type="text" name="interface.seq" class="layui-input" value="${interface.seq}">
             </div>
           </div>
         </form>
@@ -140,16 +147,16 @@ i {
                 </select>
               </td>
               <td>
-                <input name="extend" type="text" placeholder="" class="layui-input" value="@if(p.type == "enum") { print(p.enum_value); } else if ( p.type == "object" || p.type == "array" ) { print(p.array_type); }
+                <input name="extend" type="text" placeholder="" class="layui-input" value="@if(p.type == "enum"){print(p.enum_value);}else if(p.type == "object" || p.type == "array"){print(p.array_type);}
                 ">
-                <input name="param.array_type" type="hidden" value="${p.array_type}">
-                <input name="param.enum_value" type="hidden" value="${p.enum_value}">
+                <input name="param.array_type" type="hidden" value="${p.array_type! null}">
+                <input name="param.enum_value" type="hidden" value="${p.enum_value! null}">
               </td>
               <td>
                 <input name="param.max" type="text" placeholder="" class="layui-input" value="${p.max}">
               </td>
               <td>
-                <input name="model.format" type="text" placeholder="" class="layui-input" value="${p.format}">
+                <input name="param.format" type="text" placeholder="" class="layui-input" value="${p.format}">
               </td>
               <td>
                 <input name="param.require" type="hidden">
@@ -180,11 +187,21 @@ i {
             </div>
           </div>
 
-          <div class="layui-form-item">
-            <div class="layui-input-block">
+          <div class="layui-form-item" style="margin-left: 110px;">
+            <div class="layui-inline">
+              <select name="select_json_temp">
+                <option value="">选择生成模板</option>
+                <option value="page_temp">分页模板</option>
+              </select>
+            </div>
+            <div class="layui-inline">
+              <button class="layui-btn gen_json_temp">生成JSON模板</button>
+            </div>
+            <div class="layui-inline">
               <button class="layui-btn layui-btn-primary format-json">JSON格式化</button>
             </div>
           </div>
+
         </form>
       </div>
     </div>
@@ -212,7 +229,7 @@ i {
       <input name="param.max" type="text" placeholder="" class="layui-input">
     </td>
     <td>
-      <input name="model.format" type="text" placeholder="" class="layui-input">
+      <input name="param.format" type="text" placeholder="" class="layui-input">
     </td>
     <td>
       <input name="param.require" type="hidden">
@@ -223,6 +240,8 @@ i {
     </td>
   </tr>
 </script>
+<script src="../static/module/jquery/jquery-1.9.1.min.js"></script>
+<script src="//apps.bdimg.com/libs/jqueryui/1.10.4/jquery-ui.min.js"></script>
 <script src="${base}/static/module/layui/layui.js"></script>
 <script src="${base}/static/global/js/global.js"></script>
 <script src="${base}/static/app/project/js/interface.js"></script>
