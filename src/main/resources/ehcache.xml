@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ehcache xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="http://ehcache.org/ehcache.xsd"
+         updateCheck="false" monitoring="autodetect"
+         dynamicConfig="true">
+
+  <diskStore path="java.io.tmpdir"/>
+  <!--
+    TTI(timeToIdleSeconds): 用于设置对象在cache中的最大闲置时间，就是 在一直不访问这个对象的前提下，这个对象可以在cache中的存活时间。
+    TTL(timeToLiveSeconds): 用于设置对象在cache中的最大存活时间，就是 无论对象访问或是不访问(闲置),这个对象在cache中的存活时间。
+    eternal: 当配置了 eternal ，那么TTI和TTL这两个配置将被覆盖，对象会永恒存在cache中，永远不会过期。
+  -->
+  <defaultCache
+          maxElementsInMemory="5000"
+          eternal="false"
+          timeToIdleSeconds="180"
+          timeToLiveSeconds="180"
+          overflowToDisk="false" />
+
+  <cache name="Web"
+         maxEntriesLocalHeap="5000"
+         maxEntriesLocalDisk="1000"
+         eternal="false"
+         overflowToDisk="true"
+         diskSpoolBufferSizeMB="20"
+         timeToIdleSeconds="600"
+         timeToLiveSeconds="600"
+         memoryStoreEvictionPolicy="LFU"
+         transactionalMode="off" />
+</ehcache>

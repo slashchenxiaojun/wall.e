@@ -57,6 +57,22 @@ public abstract class BaseInterface<M extends BaseInterface<M>> extends BaseMode
 		return get("data");
 	}
 
+	public void setResultData(java.lang.String resultData) {
+		set("result_data", resultData);
+	}
+
+	public java.lang.String getResultData() {
+		return get("result_data");
+	}
+
+	public void setSeq(java.lang.Integer seq) {
+		set("seq", seq);
+	}
+
+	public java.lang.Integer getSeq() {
+		return get("seq");
+	}
+
 	public void setWProjectId(java.lang.Integer wProjectId) {
 		set("w_project_id", wProjectId);
 	}

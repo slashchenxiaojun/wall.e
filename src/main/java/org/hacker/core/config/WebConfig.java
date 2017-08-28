@@ -1,5 +1,6 @@
 package org.hacker.core.config;
 
+import com.jfinal.plugin.ehcache.EhCachePlugin;
 import org.apache.log4j.Logger;
 import org.beetl.ext.jfinal.BeetlRenderFactory;
 import org.hacker.aop.handler.GlobalHandler;
@@ -36,6 +37,7 @@ public class WebConfig extends JFinalConfig {
 	@Override
 	public void configPlugin(Plugins me) {
 		PluginFactory.startActiveRecordPlugin();
+		me.add( new EhCachePlugin() );
 	}
 
 	@Override

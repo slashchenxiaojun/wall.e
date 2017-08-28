@@ -30,6 +30,7 @@ i {
     <ul class="layui-tab-title">
       <li class="layui-this">接口配置</li>
       <li>参数配置</li>
+      <li>响应配置</li>
       <li>模拟响应值</li>
     </ul>
     <div class="layui-tab-content">
@@ -124,6 +125,10 @@ i {
                     <option value="Enum" @if (p.type == "enum") { print("selected"); }
                     >Enum</option>
                   </optgroup>
+                  <optgroup label="整形类型">
+                    <option value="Integer" @if (p.type == "integer") { print("selected"); }
+                    >Integer</option>
+                  </optgroup>
                   <optgroup label="数值类型">
                     <option value="Number" @if (p.type == "number") { print("selected"); }
                     >Number</option>
@@ -179,10 +184,38 @@ i {
         </div>
         <form class="layui-form" style="padding: 20px 70px 0 40px;">
           <div class="layui-form-item">
+            <label class="layui-form-label">接口返回值配置(JSON)</label>
+            <div class="layui-input-block">
+              <textarea name="interface.result_data" class="layui-textarea" style="height: 350px;">${interface.result_data}</textarea>
+            </div>
+          </div>
+
+          <div class="layui-form-item" style="margin-left: 110px;">
+            <div class="layui-inline">
+              <select name="result_select_json_temp">
+                <option value="">选择生成模板</option>
+                <option value="page_temp">分页模板</option>
+              </select>
+            </div>
+            <div class="layui-inline">
+              <button class="layui-btn result_gen_json_temp">生成JSON模板</button>
+            </div>
+            <div class="layui-inline">
+              <button class="layui-btn layui-btn-primary result_format_json">JSON格式化</button>
+            </div>
+          </div>
+
+        </form>
+      </div>
+      <div class="layui-tab-item ">
+        <div class="alert alert-danger">
+          <strong>Oh snap!</strong>
+          <span>JSON GESH ERROR</span>
+        </div>
+        <form class="layui-form" style="padding: 20px 70px 0 40px;">
+          <div class="layui-form-item">
             <label class="layui-form-label">接口模拟数据(JSON)</label>
             <div class="layui-input-block">
-              <input type="hidden" name="interface.id" class="layui-input" value="${interface.id}">
-              <input type="hidden" name="interface.code" class="layui-input" value="${interface.code}">
               <textarea name="interface.data" class="layui-textarea" style="height: 350px;">${interface.data}</textarea>
             </div>
           </div>

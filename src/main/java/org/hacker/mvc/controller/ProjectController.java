@@ -2,12 +2,16 @@ package org.hacker.mvc.controller;
 
 import static org.hacker.module.common.Assert.checkNotNull;
 
-import java.util.List;
+import java.util.*;
 
 import com.alibaba.fastjson.JSON;
 import com.jfinal.aop.Before;
 import com.jfinal.plugin.activerecord.Db;
+import com.jfinal.plugin.activerecord.Record;
 import com.jfinal.plugin.activerecord.tx.Tx;
+import com.jfinal.plugin.ehcache.CacheInterceptor;
+import com.jfinal.plugin.ehcache.CacheName;
+import com.jfinal.plugin.ehcache.EvictInterceptor;
 import org.hacker.core.BaseController;
 import org.hacker.exception.ApiException;
 import org.hacker.mvc.model.Folder;
@@ -57,6 +61,8 @@ public class ProjectController extends BaseController {
 	 * 一次性获取到接口的树形结构json
 	 * @throws Exception 
 	 */
+	@Before(CacheInterceptor.class)
+	@CacheName("Web")
 	public void getTreeFolder() {
 		Integer project_id = getParaToInt("project.id");
 		
@@ -64,34 +70,70 @@ public class ProjectController extends BaseController {
 		
 		JSONArray nodes = new JSONArray(1);
 		// 寻找root
-		List<Folder> list = getTreeNode(project_id, 0, 1);
-		for(Folder folder : list) {
-			JSONObject tree_node = new JSONObject();
-			JSONArray node = new JSONArray();
-			List<Interface> inodes = getInterfaceNode(folder.getId());
-			for(Interface iface : inodes) {
+		List<Record> list = getTreeNode(project_id);
+		Set<String> nodeNameSet = new HashSet<>();
+		Map<String, JSONArray> childrenNodeMap = new HashMap<>();
+		for (Record record : list) {
+			String folderName = record.get("folder_name");
+			// init
+			if ( childrenNodeMap.get(folderName) == null ) {
+				childrenNodeMap.put(folderName, new JSONArray());
+			}
+			Object interfaceId = record.get("id");
+			if ( interfaceId != null ) {
 				JSONObject children = new JSONObject();
-				children.put("interface_id", iface.getId());
-				children.put("code", iface.getCode());
-				children.put("name", iface.getName());
-				// 使用自定义图标
+				children.put("interface_id", interfaceId);
+				children.put("code", record.get("code"));
+				children.put("name", record.get("name"));
 				children.put("iconSkin", "icon01");
-				node.add(children);
+				childrenNodeMap.get(folderName).add(children);
 			}
-			if(node.size() > 0) {
-				tree_node.put("children", node);
-			} else {
-				// 使用自定义图标
-				tree_node.put("iconSkin", "icon00");
-			}
-			tree_node.put("folder_id", folder.getId());
-			tree_node.put("name", folder.getName());
-			nodes.add(tree_node);
 		}
+		for (Record record : list) {
+			String folderName = record.get("folder_name");
+			// 避免重复添加相当于做了group by的操作
+			if ( !nodeNameSet.contains(folderName) ) {
+				nodeNameSet.add(folderName);
+				JSONObject tree_node = new JSONObject();
+				tree_node.put("folder_id", record.get("folder_id"));
+				tree_node.put("name", folderName);
+				if ( childrenNodeMap.get(folderName).size() > 0 ) {
+					tree_node.put("children", childrenNodeMap.get(folderName));
+				} else {
+					tree_node.put("iconSkin", "icon00");
+				}
+				nodes.add(tree_node);
+			}
+		}
+//		for(Folder folder : list) {
+//			JSONObject tree_node = new JSONObject();
+//			JSONArray node = new JSONArray();
+//			List<Interface> inodes = getInterfaceNode(folder.getId());
+//			for(Interface iface : inodes) {
+//				JSONObject children = new JSONObject();
+//				children.put("interface_id", iface.getId());
+//				children.put("code", iface.getCode());
+//				children.put("name", iface.getName());
+//				// 使用自定义图标
+//				children.put("iconSkin", "icon01");
+//				node.add(children);
+//			}
+//			if(node.size() > 0) {
+//				tree_node.put("children", node);
+//			} else {
+//				// 使用自定义图标
+//				tree_node.put("iconSkin", "icon00");
+//			}
+//			tree_node.put("folder_id", folder.getId());
+//			tree_node.put("name", folder.getName());
+//			nodes.add(tree_node);
+//		}
 		OK(nodes);
 	}
 	
 	// 暂时只满足一层级的需求
+	@Before(EvictInterceptor.class)
+	@CacheName("Web")
 	public void createFolder() {
 		Integer project_id = getParaToInt("project.id");
 		String name = getPara("folder.name");
@@ -112,7 +154,9 @@ public class ProjectController extends BaseController {
 		else
 			Error(500, "Oop! create folder fail.");
 	}
-	
+
+	@Before(EvictInterceptor.class)
+	@CacheName("Web")
 	public void renameFolder() {
 	  Integer project_id = getParaToInt("project.id");
 	  Integer folder_id = getParaToInt("folder.id");
@@ -134,7 +178,9 @@ public class ProjectController extends BaseController {
     else
       Error(500, "Oop! create folder fail.");
 	}
-	
+
+	@Before(EvictInterceptor.class)
+	@CacheName("Web")
 	public void deteleFolder() {
 		Integer folder_id = getParaToInt("folder.id");
 		
@@ -151,6 +197,8 @@ public class ProjectController extends BaseController {
 	}
 	
 	// 获取folder下的所有接口
+	@Before(CacheInterceptor.class)
+	@CacheName("Web")
 	public void getInterfaceByFolder() {
 	  Integer projectId = getParaToInt("project.id");
 	  Integer folderId = getParaToInt("folder.id");
@@ -158,9 +206,9 @@ public class ProjectController extends BaseController {
 	  checkNotNull(projectId, "project.id");
 	  checkNotNull(folderId, "folder.id");
 	  
-	  OK(Interface.dao.find("select * from w_interface where w_project_id = ? and  w_folder_id = ?", projectId, folderId));
+	  OK(Interface.dao.find("select * from w_interface where w_project_id = ? and  w_folder_id = ? order by seq asc", projectId, folderId));
 	}
-	
+
 	public void getInterface() {
 	  Integer interfaceId = getParaToInt("interface.id");
 	   
@@ -170,6 +218,8 @@ public class ProjectController extends BaseController {
 	}
 	 
 	// 快速创建接口
+	@Before(EvictInterceptor.class)
+	@CacheName("Web")
 	public void createInterfaceQuick() {
 	  Integer projectId = getParaToInt("project.id");
 	  String folderId = getPara("folder.id");
@@ -217,7 +267,8 @@ public class ProjectController extends BaseController {
     render("_interface_simulation_data.html");
   }
 
-  @Before(Tx.class)
+	@CacheName("Web")
+  @Before( { EvictInterceptor.class, Tx.class } )
 	public void saveInterface() {
 	  Integer projectId = getParaToInt("project.id");
 	  Interface interfaces = getModel(Interface.class, "interface");
@@ -225,29 +276,53 @@ public class ProjectController extends BaseController {
 
 	  checkNotNull(projectId, "project.id");
 	  checkNotNull(interfaces.getCode(), "interface.code");
-	  
+
+
+		String data = interfaces.getData();
+		// 去除不规范的json数据
+		if ( StrKit.notBlank(data) ) {
+			data = data.replaceAll("(\\r\\n)+\\{", "\\{");
+			data = data.replaceAll("\\}(\\r\\n)+$", "\\}");
+			data = data.replaceAll(" {4}", "  ");
+			interfaces.setData(data);
+		}
+    String result = interfaces.getResultData();
+    // 去除不规范的json数据
+    if ( StrKit.notBlank(result) ) {
+      result = result.replaceAll("(\\r\\n)+\\{", "\\{");
+      result = result.replaceAll("\\}(\\r\\n)+$", "\\}");
+      result = result.replaceAll(" {4}", "  ");
+      interfaces.setResultData(result);
+    }
+
 	  boolean create = interfaces.getId() == null;
 	  if (create) {
 			interfaces.save();
-			for (Parameter parameter : parameterList) {
-				parameter.setWInterfaceId(interfaces.getId());
-				parameter.save();
+			if ( parameterList != null ) {
+				for (Parameter parameter : parameterList) {
+					parameter.setWInterfaceId(interfaces.getId());
+					parameter.save();
+				}
 			}
 //	    throw new ApiException("Oop! interfaces id is null");
 	  } else {
 	    checkSameInterfaceCode(projectId, interfaces.getCode(), interfaces.getId());
 	    if (interfaces.update()) {
 				Db.update("DELETE FROM w_parameter WHERE w_interface_id = ?", interfaces.getId());
-				for (Parameter parameter : parameterList) {
-					parameter.setWInterfaceId(interfaces.getId());
-					parameter.save();
+				if ( parameterList != null ) {
+					for (Parameter parameter : parameterList) {
+						parameter.setWInterfaceId(interfaces.getId());
+						parameter.save();
+					}
 				}
 	    	OK();
 			}
 	    else Error(500, "Oop! save interface fail.");
 	  }
 	}
-	
+
+	@Before(EvictInterceptor.class)
+	@CacheName("Web")
 	public void renameInterface() {
 	  Integer projectId = getParaToInt("project.id");
     String interfaceId = getPara("interface.id");
@@ -268,7 +343,9 @@ public class ProjectController extends BaseController {
     else
       Error(500, "Oop! create interface fail.");
 	}
-	
+
+	@Before(EvictInterceptor.class)
+	@CacheName("Web")
 	public void deteleInterface() {
 	  Integer interface_id = getParaToInt("interface.id");
     
@@ -314,7 +391,12 @@ public class ProjectController extends BaseController {
     LOG.info(String.format("ID[%n]-interface:[%s (%s)] invoke result:[%s]", interfaces.getId(), interfaces.getName(), interfaces.getCode(), result));
     OK(JSON.parse(result));
 	}
-	
+
+	// 直接获取tree的数据结构
+	private List<Record> getTreeNode(int projectId) {
+		return Db.find("SELECT f.id folder_id, f.name folder_name, i.* FROM w_folder f LEFT JOIN w_interface i ON f.id = i.w_folder_id WHERE f.w_project_id = ? ORDER BY f.name, i.seq", projectId);
+	}
+
 	/**
 	 * 适配layui-tree的数据结构,并且暂时只支持一层
 	 * @return

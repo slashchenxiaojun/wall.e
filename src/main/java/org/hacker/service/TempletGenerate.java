@@ -14,11 +14,7 @@ import org.beetl.core.exception.BeetlException;
 import org.beetl.core.resource.WebAppResourceLoader;
 import org.hacker.exception.GenerateException;
 import org.hacker.module.common.FileKit;
-import org.hacker.mvc.model.DbModel;
-import org.hacker.mvc.model.DbModelItem;
-import org.hacker.mvc.model.DbModelMapping;
-import org.hacker.mvc.model.Generate;
-import org.hacker.mvc.model.Project;
+import org.hacker.mvc.model.*;
 import org.hacker.mvc.view.CamelNameConvert;
 import org.hacker.mvc.view.FirstCharToLowerCase;
 import org.hacker.mvc.view.ToLowerCase;
@@ -258,7 +254,57 @@ public class TempletGenerate {
     }
     System.out.println("############getGenerateConfig success############");
   }
-	
+
+  // 生成接口Markdown文档
+  public void generateInterfaceMarkdownDoc(Object projectId, String templatePath) {
+    if(StrKit.isBlank(templatePath)) templatePath = MAVEN_BASE + "gen/web/4interfaceMarkdownDoc.btl";
+    Template t_md = gt.getTemplate(templatePath);
+
+    Project project = Project.dao.findById(projectId);
+    if ( project == null ) return;
+
+    List<Folder> folderList = Folder.dao.find("SELECT * FROM w_folder WHERE w_project_id = ?", projectId);
+    Map<String, List<Interface>> interfaceMap = new HashMap<>();
+    Map<String, List<Parameter>> parameterMap = new HashMap<>();
+    for (Folder folder : folderList) {
+      List<Interface> interfaceList = Interface.dao.find("SELECT * FROM w_interface WHERE w_project_id = ? AND w_folder_id = ?", projectId, folder.getId());
+      interfaceMap.put(folder.getName(), interfaceList);
+      for (Interface anInterface : interfaceList) {
+        List<Parameter> parameterList = Parameter.dao.find("SELECT * FROM w_parameter WHERE w_interface_id = ?", anInterface.getId());
+        // 接口返回数据UI优化
+//        String data = anInterface.getData();
+//        if ( StrKit.notBlank(data) ) {
+//          data = data.replaceAll("\\}", "  \\}");
+//          anInterface.setData(data);
+//        }
+        parameterMap.put(anInterface.getCode(), parameterList);
+      }
+    }
+
+    t_md.binding("folderList", folderList);
+    t_md.binding("interfaceMap", interfaceMap);
+    t_md.binding("parameterMap", parameterMap);
+
+    File file = getConfigGenerateFile("", project.getName() + "-接口文档.md");
+    System.out.println(file.getAbsolutePath());
+    try {
+      FileKit.write(t_md.render(), file);
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+    System.out.println("############Generate Interface Markdown Doc success############");
+  }
+
+  // 生成接口代码
+  // 包含controller代码与bean代码
+  public void generateInterfaceControllerCode(String templatePath) {
+
+  }
+
+  public void generateInterfaceRequestBeanCode() {
+
+  }
+
 	public Map<String, Object> getGenerateParamter(DbModel model, boolean isCamelName) {
 	  if(model == null || model.getId() == null) 
       throw new GenerateException("Oop~ model is null.");

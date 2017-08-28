@@ -95,10 +95,10 @@ layui.use(['layer', 'form', 'element'], function() {
 
   $(document).on('click', '.delete-form', function(){
     var tr_list = $('.param-form-item').children();
-    if(tr_list.length == 1) {
-      layer.msg('没东西可删除了');
-      return false;
-    }
+//    if(tr_list.length == 1) {
+//      layer.msg('没东西可删除了');
+//      return false;
+//    }
     $(this).parent().parent().remove();
     tr_list = $('.param-form-item').children();
     // 重构序列号
@@ -160,7 +160,7 @@ layui.use(['layer', 'form', 'element'], function() {
                     ]\
                   }'
   };
-  // ----- 生成JSON result模板代码
+  // ----- 生成JSON 模拟数据模板代码
   $('.gen_json_temp').on('click', function() {
     var temp = $('select[name="select_json_temp"]').val();
     // 根据模板获取JSON数据
@@ -168,4 +168,36 @@ layui.use(['layer', 'form', 'element'], function() {
     return false;
   });
 
+  // 生成返回值json模板的数据
+  var result_temp_data = {
+    'page_temp': '{\
+                    "totalRow": "总行数",\
+                    "totalPage": "总分页数",\
+                    "pageSize": "每一页大小",\
+                    "pageNumber": "当前分页索引",\
+                    "list": [\
+                    ]\
+                  }'
+  };
+  // ----- 生成JSON 接口返回值配置模板代码
+  $('.result_gen_json_temp').on('click', function() {
+    var temp = $('select[name="result_select_json_temp"]').val();
+    // 根据模板获取JSON数据
+    $('textarea[name="interface.result_data"]').val(result_temp_data[temp]);
+    return false;
+  });
+
+  $('.result_format_json').on('click', function(e) {
+    e.preventDefault();
+    hideError();
+    var json = $('textarea[name="interface.result_data"]').val();
+    var format = null;
+    try {
+      format = parent.formatJson(json);
+      $('textarea[name="interface.result_data"]').val(format.substr(1));
+    } catch(e) {
+      showError(e);
+    }
+    return false;
+  });
 });
