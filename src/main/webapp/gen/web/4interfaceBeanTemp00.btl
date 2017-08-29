@@ -1,0 +1,69 @@
+package ${classPath}.module.${moduleName}.bean.request;
+
+@ // 遍历选取import需要导入的包
+@ var notBlank = false;
+@ var notNull = false;
+@ var array = false;
+@ var number = false;
+@ var date = false;
+@ var length = false;
+@ var pattern = false;
+@ for ( p in parameterList ) { // interfaceCode -> parameterList
+@   if ( p.type == "array" ) { array = true; }
+@   if ( p.type == "number" ) { number = true; }
+@   if ( p.type == "date" ) { date = true; }
+@   if ( p.type == "string" && p.require == true ) { notBlank = true; }
+@   if ( p.type != "string" && p.require == true ) { notNull = true; }
+@   if ( p.type == "string" && p.max != null ) { length = true; }
+@   if ( p.type == "string" && p.format != null ) { pattern = true; }
+@ }
+@ if ( length ) {
+import org.hibernate.validator.constraints.Length;
+@ }
+@ if ( notBlank ) {
+import org.hibernate.validator.constraints.NotBlank;
+@ }
+@ if ( notNull ) {
+import javax.validation.constraints.NotNull;
+@ }
+@ if ( pattern ) {
+import javax.validation.constraints.Pattern;
+@ }
+@ if ( number ) {
+import java.math.BigDecimal;
+@ }
+@ if ( array ) {
+import java.util.List;
+@ }
+@ if ( date ) {
+import java.util.Date;
+@ }
+@ var now = date();
+/**
+ * Created by `wall.e`(https://github.com/slashchenxiaojun/wall.e) on ${now,'yyyy/MM/dd'}.
+ */
+public class ${className} {
+@ for ( p in parameterList ) {
+@
+@ if ( p.require ) { print( p.type == "string" ? "  @NotBlank\r\n" : "  @NotNull\r\n"); }
+@   var type = toJavaType( p.type, (p.type == "enum" ? p.name : p.array_type) );
+@   var paramName = firstCharToLowerCase(p.name);
+@ if ( p.type == "string" && p.max != null ) { print("  @Length(max = " + p.max + ")\r\n"); }
+@ if ( p.type == "string" && p.format != null ) { print("  @Pattern(regexp=\"" + p.format + "\")\r\n"); }
+  private ${type} ${paramName};
+@ }
+
+@ for ( p in parameterList ) { // get & set
+@   var type = toJavaType( p.type, (p.type == "enum" ? p.name : p.array_type) );
+@   var methodName = camelNameConvert(p.name);
+@   var paramName = firstCharToLowerCase(p.name);
+  public ${type} get${methodName}() {
+    return ${paramName};
+  }
+
+  public void set${methodName}(${type} ${paramName}) {
+    this.${paramName} = ${paramName};
+  }@ if ( pLP.last != true ) { print("\r\n\r\n"); } else { print("\r\n"); }
+@
+@ }
+}

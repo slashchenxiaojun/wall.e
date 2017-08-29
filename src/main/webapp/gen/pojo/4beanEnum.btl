@@ -1,0 +1,12 @@
+package ${classPath}.module.${moduleName}.bean.request;
+
+@ var now = date();
+/**
+ * Created by `wall.e`(https://github.com/slashchenxiaojun/wall.e) on ${now,'yyyy/MM/dd'}.
+ */
+public enum ${enumClassName} {
+@ for ( v in enumValues ) {
+@   print("  " + v);
+@   if ( vLP.last != true ) { print(",\r\n"); } else { print("\r\n"); }
+@ }
+}

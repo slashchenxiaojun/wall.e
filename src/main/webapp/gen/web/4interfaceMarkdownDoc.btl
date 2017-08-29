@@ -8,12 +8,21 @@
   - 路径: ${api.relative_url}
   - 描述: ${api.description}
   - 参数:
-  - | 名称          | 描述        | 类型        | 大小    | 特殊格式       | 可空   |
+  - | 名称          | 描述        | 类型        | 大小    | 特殊格式       | 必须   |
     | ------------- |:-----------:|:-----------:|:-------:|:--------------:|-------:|
     @for ( pentry in parameterMap ) {
       @if( pentry.key == api.code ) {
         @for( para in pentry.value ) {
-          @ var p = "    " + "| " + para.name + " | " + para.remarks + " | " + para.type + " | " + para.max + " | " + (para.format == null ? "none" : para.format) + " | " + (para.require == true ? "是" : "否") + "\r\n";
+          @ var p = "    " + "| " + para.name + " | " + ( para.remarks == null ? "none" : para.remarks) + " | " + para.type + " | " + ( para.max == null ? "none" : para.max) + " | ";
+          @ // enum 使用 enum_type, array 使用 array_type, 其他使用format
+          @ if( para.type == "enum" ) {
+          @   p = p + ( para.enum_value == null ? "none" : para.enum_value );
+          @ } else if ( para.type == "array" ) {
+          @   p = p + ( para.array_type == null ? "none" : para.array_type );
+          @ } else {
+          @   p = p + (para.format == null ? "none" : para.format);
+          @ }
+          @ p = p + " | " + (para.require == true ? "是" : "否") + "\r\n";
           @ print(p);
         @}
       @}
@@ -21,7 +30,7 @@
 
   - 返回值:
 ```
-${api.data ! "null"}
+${api.result_data ! "null"}
 ```
   @    } // end 接口
   @  } // end if

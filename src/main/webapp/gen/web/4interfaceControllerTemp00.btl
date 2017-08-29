@@ -1,0 +1,43 @@
+package ${classPath}.module.${moduleName}.controller;
+
+@ for( bean in beanNameList ) {
+import ${beanClassPath}.module.${moduleName}.bean.request.${bean};
+@}
+@ // 导入service
+@ var serviceName = firstCharToUpperCase(moduleName) + "Service";
+@ var serviceFieldName = moduleName + "Service";
+import ${classPath}.module.${moduleName}.service.${serviceName};
+import com.jfinal.core.ActionKey;
+import org.hacker.core.BaseController;
+
+@ var now = date();
+/**
+ * Created by `wall.e`(https://github.com/slashchenxiaojun/wall.e) on ${now,'yyyy/MM/dd'}.
+ */
+public class ${className} extends BaseController {
+  ${serviceName} ${serviceFieldName} = new ${serviceName}();
+
+@ for ( api in interfaceList ) {
+@   var beanName = firstCharToUpperCase(api.code) + "Bean";
+  \@ActionKey("${api.relative_url}")
+  public void ${api.code}() {
+@   if ( interfaceParamMap[api.code] != null ) {
+@     var paramName = interfaceParamMap[api.code];
+    Object ${paramName} = getPara();
+
+    ${serviceFieldName}.${api.code}Check(${paramName});
+    Object data = ${serviceFieldName}.${api.code}Service(${paramName});
+
+    OK(data);
+@   } else {
+    ${beanName} bean = getJson2Bean(${beanName}.class);
+    JSR303Validator(bean);
+
+    ${serviceFieldName}.${api.code}Check(bean);
+    Object data = ${serviceFieldName}.${api.code}Service(bean);
+
+    OK(data);
+@   }
+  }@ if ( apiLP.last != true ) { print("\r\n\r\n"); } else { print("\r\n"); }
+@ }
+}

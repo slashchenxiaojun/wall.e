@@ -4,7 +4,7 @@ import org.beetl.core.Context;
 import org.beetl.core.Function;
 
 /**
- * 首字符小写function
+ * 小写function
  * @author Mr.J
  *
  */

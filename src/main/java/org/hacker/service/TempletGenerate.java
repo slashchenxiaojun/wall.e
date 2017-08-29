@@ -3,9 +3,11 @@ package org.hacker.service;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
 
 import org.beetl.core.Configuration;
 import org.beetl.core.GroupTemplate;
@@ -15,9 +17,7 @@ import org.beetl.core.resource.WebAppResourceLoader;
 import org.hacker.exception.GenerateException;
 import org.hacker.module.common.FileKit;
 import org.hacker.mvc.model.*;
-import org.hacker.mvc.view.CamelNameConvert;
-import org.hacker.mvc.view.FirstCharToLowerCase;
-import org.hacker.mvc.view.ToLowerCase;
+import org.hacker.mvc.view.*;
 
 import com.jfinal.kit.StrKit;
 import com.jfinal.plugin.activerecord.Db;
@@ -65,7 +65,9 @@ public class TempletGenerate {
 	  
 	  gt.registerFunction("camelNameConvert", new CamelNameConvert());
 	  gt.registerFunction("firstCharToLowerCase", new FirstCharToLowerCase());
+    gt.registerFunction("firstCharToUpperCase", new FirstCharToUpperCase());
 	  gt.registerFunction("toLowerCase", new ToLowerCase());
+	  gt.registerFunction("toJavaType", new ToJavaType());
 	}
 	
 	/**
@@ -267,10 +269,10 @@ public class TempletGenerate {
     Map<String, List<Interface>> interfaceMap = new HashMap<>();
     Map<String, List<Parameter>> parameterMap = new HashMap<>();
     for (Folder folder : folderList) {
-      List<Interface> interfaceList = Interface.dao.find("SELECT * FROM w_interface WHERE w_project_id = ? AND w_folder_id = ?", projectId, folder.getId());
+      List<Interface> interfaceList = Interface.dao.find("SELECT * FROM w_interface WHERE w_project_id = ? AND w_folder_id = ? order by seq asc", projectId, folder.getId());
       interfaceMap.put(folder.getName(), interfaceList);
       for (Interface anInterface : interfaceList) {
-        List<Parameter> parameterList = Parameter.dao.find("SELECT * FROM w_parameter WHERE w_interface_id = ?", anInterface.getId());
+        List<Parameter> parameterList = Parameter.dao.find("SELECT * FROM w_parameter WHERE w_interface_id = ? order by seq asc", anInterface.getId());
         // 接口返回数据UI优化
 //        String data = anInterface.getData();
 //        if ( StrKit.notBlank(data) ) {
@@ -296,13 +298,201 @@ public class TempletGenerate {
   }
 
   // 生成接口代码
-  // 包含controller代码与bean代码
-  public void generateInterfaceControllerCode(String templatePath) {
+  // ----- 包含controller代码与bean代码
+  public void generateInterfaceControllerCode(Object projectId, String classPath, String beanClassPath, String templatePath) {
+    if(StrKit.isBlank(templatePath)) templatePath = MAVEN_BASE + "gen/web/4interfaceControllerTemp00.btl";
+    Template t_controller = gt.getTemplate(templatePath);
 
+    Project project = Project.dao.findById(projectId);
+    if ( project == null ) return;
+
+    List<Folder> folderList = Folder.dao.find("SELECT * FROM w_folder WHERE w_project_id = ?", projectId);
+    if ( folderList == null ) return;
+
+    // 一个目录相当于一个controller
+    for (Folder folder : folderList) {
+      String moduleName = folder.getName().toLowerCase();
+      String className = StrKit.firstCharToUpperCase(folder.getName()) + "Controller";
+      String controllerClassPath = classPath +
+              File.separator + "module" +
+              File.separator + moduleName +
+              File.separator + "controller";
+      File file = getConfigGenerateFile(controllerClassPath,className + ".java");
+
+      t_controller.binding("classPath", classPath.replaceAll(Matcher.quoteReplacement(File.separator), "."));
+      t_controller.binding("moduleName", moduleName);
+      t_controller.binding("className", className);
+      t_controller.binding("beanClassPath", beanClassPath.replaceAll(Matcher.quoteReplacement(File.separator), "."));
+      // 获取接口
+      List<Interface> interfaceList = Interface.dao.find("SELECT * FROM w_interface WHERE w_project_id = ? AND w_folder_id = ? order by seq asc", projectId, folder.getId());
+      List<String> beanNameList = new ArrayList<>();
+      // 特殊的没有bean的接口，使用接口code -> 参数名字来做存储
+      /**
+       * @ActionKey("/root/xx/${hhId}")
+       * public void xx() {}
+       * xx -> hhId
+       *
+       * xx 就是接口的code
+       */
+      Map<String, String> interfaceParamMap = new HashMap<>();
+      for (Interface anInterface : interfaceList) {
+        boolean hasBean = Db.findFirst("SELECT COUNT(1) FROM w_parameter WHERE w_interface_id = ?", anInterface.getId()).getLong("COUNT(1)") > 0;
+        if ( StrKit.notBlank(anInterface.getCode()) && hasBean ) {
+          beanNameList.add(StrKit.firstCharToUpperCase(anInterface.getCode()) + "Bean");
+        }
+        // 没有参数
+        boolean isUrlParam = false;
+        String url = anInterface.getRelativeUrl();
+        isUrlParam = url.matches(".*/\\$\\{[A-Za-z_]+\\}$");
+        if ( StrKit.notBlank(anInterface.getCode()) && isUrlParam ) {
+          int start = url.indexOf("/${");
+          int end = url.indexOf("}");
+          url = url.substring(start + 3, end);
+          // 将${}中的东西写入
+          interfaceParamMap.put(anInterface.getCode(), url);
+        }
+      }
+
+      t_controller.binding("interfaceParamMap", interfaceParamMap);
+      t_controller.binding("beanNameList", beanNameList);
+      t_controller.binding("interfaceList", interfaceList);
+
+      System.out.println(file.getAbsolutePath());
+      try {
+        FileKit.write(t_controller.render(), file);
+      } catch (Exception e) {
+        e.printStackTrace();
+      }
+    }
+    System.out.println("############Generate interface controller code success############");
   }
 
-  public void generateInterfaceRequestBeanCode() {
+  // 用户编写业务代码的service，为了防止生成controller和bean代码不被覆盖
+  // 这个方法在被调用时，需要做一次密码身份认证，以免菜鸟勿用
+  public void generateInterfaceServiceCode(Object projectId, String classPath, String beanClassPath, String templatePath) {
+    if(StrKit.isBlank(templatePath)) templatePath = MAVEN_BASE + "gen/web/4interfaceServiceTemp00.btl";
+    Template t_service = gt.getTemplate(templatePath);
 
+    Project project = Project.dao.findById(projectId);
+    if ( project == null ) return;
+
+    List<Folder> folderList = Folder.dao.find("SELECT * FROM w_folder WHERE w_project_id = ?", projectId);
+    if ( folderList == null ) return;
+
+    // 一个目录相当于一个controller
+    for (Folder folder : folderList) {
+      String moduleName = folder.getName().toLowerCase();
+      String className = StrKit.firstCharToUpperCase(folder.getName()) + "Service";
+      String serviceClassPath = classPath +
+              File.separator + "module" +
+              File.separator + moduleName +
+              File.separator + "service";
+      File file = getConfigGenerateFile(serviceClassPath,className + ".java");
+
+      t_service.binding("classPath", classPath.replaceAll(Matcher.quoteReplacement(File.separator), "."));
+      t_service.binding("moduleName", moduleName);
+      t_service.binding("className", className);
+      t_service.binding("beanClassPath", beanClassPath.replaceAll(Matcher.quoteReplacement(File.separator), "."));
+      // 获取接口
+      List<Interface> interfaceList = Interface.dao.find("SELECT * FROM w_interface WHERE w_project_id = ? AND w_folder_id = ? order by seq asc", projectId, folder.getId());
+      List<String> beanNameList = new ArrayList<>();
+      Map<String, String> interfaceParamMap = new HashMap<>();
+      for (Interface anInterface : interfaceList) {
+        boolean hasBean = Db.findFirst("SELECT COUNT(1) FROM w_parameter WHERE w_interface_id = ?", anInterface.getId()).getLong("COUNT(1)") > 0;
+        if ( StrKit.notBlank(anInterface.getCode()) && hasBean )
+          beanNameList.add(StrKit.firstCharToUpperCase(anInterface.getCode()) + "Bean");
+        // 没有参数
+        boolean isUrlParam = false;
+        String url = anInterface.getRelativeUrl();
+        isUrlParam = url.matches(".*/\\$\\{[A-Za-z_]+\\}$");
+        if ( StrKit.notBlank(anInterface.getCode()) && isUrlParam ) {
+          int start = url.indexOf("/${");
+          int end = url.indexOf("}");
+          url = url.substring(start + 3, end);
+          // 将${}中的东西写入
+          interfaceParamMap.put(anInterface.getCode(), url);
+        }
+      }
+      t_service.binding("interfaceParamMap", interfaceParamMap);
+      t_service.binding("beanNameList", beanNameList);
+      t_service.binding("interfaceList", interfaceList);
+
+      System.out.println(file.getAbsolutePath());
+      try {
+        FileKit.write(t_service.render(), file);
+      } catch (Exception e) {
+        e.printStackTrace();
+      }
+    }
+    System.out.println("############Generate interface service code success############");
+  }
+
+  public void generateInterfaceRequestBeanCode(Object projectId, String classPath, String templatePath) {
+    if(StrKit.isBlank(templatePath)) templatePath = MAVEN_BASE + "gen/web/4interfaceBeanTemp00.btl";
+    Template t_bean = gt.getTemplate(templatePath);
+
+    Project project = Project.dao.findById(projectId);
+    if ( project == null ) return;
+
+    List<Folder> folderList = Folder.dao.find("SELECT * FROM w_folder WHERE w_project_id = ?", projectId);
+    if ( folderList == null ) return;
+
+    // 一个目录相当于一个controller
+    for (Folder folder : folderList) {
+      String moduleName = folder.getName().toLowerCase();
+      String beanClassPath = classPath +
+              File.separator + "module" +
+              File.separator + moduleName +
+              File.separator + "bean" +
+              File.separator + "request";
+
+      // 获取接口
+      List<Interface> interfaceList = Interface.dao.find("SELECT * FROM w_interface WHERE w_project_id = ? AND w_folder_id = ? order by seq asc", projectId, folder.getId());
+      for (Interface anInterface : interfaceList) {
+        if ( StrKit.notBlank(anInterface.getCode()) ) {
+          String className = StrKit.firstCharToUpperCase(anInterface.getCode()) + "Bean";
+          // 参数
+          List<Parameter> parameterList = Parameter.dao.find("SELECT * FROM w_parameter WHERE w_interface_id = ? order by seq asc", anInterface.getId());
+          // 没有参数就不生成空的bean文件
+          if ( parameterList != null && parameterList.size() == 0 ) continue;
+
+          t_bean.binding("classPath", classPath.replaceAll(Matcher.quoteReplacement(File.separator), "."));
+          t_bean.binding("className", className);
+          t_bean.binding("moduleName", moduleName);
+          t_bean.binding("anInterface", anInterface);
+          t_bean.binding("parameterList", parameterList);
+          // 如果有enum类型，生成枚举类
+          for (Parameter parameter : parameterList) {
+            if ( parameter.getType().equals("enum") && StrKit.notBlank(parameter.getEnumValue()) ) {
+              String enumClassName = StrKit.firstCharToUpperCase(parameter.getName());
+              String[] enumValues = parameter.getEnumValue().split(",");
+              // 这里可以优化一下去掉前后的空格
+              Template enum_temp = gt.getTemplate(MAVEN_BASE + "gen/pojo/4beanEnum.btl");
+              enum_temp.binding("classPath", classPath.replaceAll(Matcher.quoteReplacement(File.separator), "."));
+              enum_temp.binding("moduleName", moduleName);
+              enum_temp.binding("enumClassName", enumClassName);
+              enum_temp.binding("enumValues", enumValues);
+              File file = getConfigGenerateFile(beanClassPath,enumClassName + ".java");
+              System.out.println(file.getAbsolutePath());
+              try {
+                FileKit.write(enum_temp.render(), file);
+              } catch (Exception e) {
+                e.printStackTrace();
+              }
+            }
+          }
+
+          File file = getConfigGenerateFile(beanClassPath,className + ".java");
+          System.out.println(file.getAbsolutePath());
+          try {
+            FileKit.write(t_bean.render(), file);
+          } catch (Exception e) {
+            e.printStackTrace();
+          }
+        }
+      }
+    }
+    System.out.println("############Generate interface bean code success############");
   }
 
 	public Map<String, Object> getGenerateParamter(DbModel model, boolean isCamelName) {

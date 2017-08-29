@@ -1,8 +1,10 @@
 package org.hacker.test.gen;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
 
 import org.beetl.core.Configuration;
 import org.beetl.core.GroupTemplate;
@@ -223,4 +225,21 @@ public class TempletGenerateTest {
     TempletGenerate tg = new TempletGenerate(root, root, null);
     tg.generateInterfaceMarkdownDoc(10, null);
   }
+
+  @Test
+  public void test_code_gen() {
+	  String root = "E:\\workspace\\wall.e\\src\\main\\java";
+    TempletGenerate tg = new TempletGenerate(root, root, null);
+    String classPath =
+    "walle" + File.separator +
+    "pstone";
+    String beanClassPath =
+    "walle" + File.separator +
+    "pstone";
+
+    tg.generateInterfaceControllerCode(10, classPath, beanClassPath, null);
+    tg.generateInterfaceServiceCode(10, classPath, beanClassPath, null);
+    tg.generateInterfaceRequestBeanCode(10, beanClassPath, null);
+  }
+
 }

@@ -1,0 +1,37 @@
+package ${classPath}.module.${moduleName}.service;
+
+@ for( bean in beanNameList ) {
+import ${beanClassPath}.module.${moduleName}.bean.request.${bean};
+@}
+
+@ var now = date();
+@ var name = firstCharToUpperCase(moduleName) + "Service";
+/**
+ * Created by `wall.e`(https://github.com/slashchenxiaojun/wall.e) on ${now,'yyyy/MM/dd'}.
+ */
+public class ${name} {
+@ for ( api in interfaceList ) {
+@   var beanName = firstCharToUpperCase(api.code) + "Bean";
+@   if ( interfaceParamMap[api.code] != null ) {
+  public void ${api.code}Check(Object ${interfaceParamMap[api.code]}) {
+  }
+
+  /**
+    ${api.result_data! 'null'}
+   */
+  public Object ${api.code}Service(Object ${interfaceParamMap[api.code]}) {
+    return null;
+  }
+@   } else {
+  public void ${api.code}Check(${beanName} bean) {
+  }
+
+  /**
+    ${api.result_data! 'null'}
+   */
+  public Object ${api.code}Service(${beanName} bean) {
+    return null;
+  }
+@   } if ( apiLP.last != true ) { print("\r\n"); }
+@ }
+}
