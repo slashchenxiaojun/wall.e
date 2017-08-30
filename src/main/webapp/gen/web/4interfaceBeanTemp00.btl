@@ -8,6 +8,7 @@ package ${classPath}.module.${moduleName}.bean.request;
 @ var date = false;
 @ var length = false;
 @ var pattern = false;
+@ var jsonObject = false;
 @ for ( p in parameterList ) { // interfaceCode -> parameterList
 @   if ( p.type == "array" ) { array = true; }
 @   if ( p.type == "number" ) { number = true; }
@@ -16,6 +17,10 @@ package ${classPath}.module.${moduleName}.bean.request;
 @   if ( p.type != "string" && p.require == true ) { notNull = true; }
 @   if ( p.type == "string" && p.max != null ) { length = true; }
 @   if ( p.type == "string" && p.format != null ) { pattern = true; }
+@   if ( p.type == "object" ) { jsonObject = true; }
+@ }
+@ if ( jsonObject ) {
+import com.alibaba.fastjson.JSONObject;
 @ }
 @ if ( length ) {
 import org.hibernate.validator.constraints.Length;
@@ -58,7 +63,13 @@ public class ${className} {
 @   var methodName = camelNameConvert(p.name);
 @   var paramName = firstCharToLowerCase(p.name);
   public ${type} get${methodName}() {
+@   if ( methodName == "PageNumber" ) { // 分页代码添加默认值
+    return pageNumber == null ? 1 : pageNumber;
+@   } else if ( methodName == "PageSize" ) {
+    return pageSize == null ? 10 : pageSize;
+@   } else {
     return ${paramName};
+@   }
   }
 
   public void set${methodName}(${type} ${paramName}) {

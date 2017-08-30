@@ -241,8 +241,8 @@ $(function() {
       + '<td class="operation">'
       + '<i class="layui-icon layui-anim layui-anim-rotate layui-anim-loop test">&#xe623;</i>' //
       + '<i class="layui-icon setting">&#xe620;</i>'
-      + '<i class="layui-icon result">&#xe60e;</i>'
-      + '<i class="layui-icon simulation">&#xe60b;</i>'
+//      + '<i class="layui-icon result">&#xe60e;</i>'
+//      + '<i class="layui-icon simulation">&#xe60b;</i>'
       + '</td></tr>';
       $('.interfaceTable').append(tr);
     }

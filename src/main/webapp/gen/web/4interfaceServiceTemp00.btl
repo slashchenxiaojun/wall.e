@@ -1,11 +1,12 @@
 package ${classPath}.module.${moduleName}.service;
 
+import cc.pstone.common.AdamUserBean;
 @ for( bean in beanNameList ) {
 import ${beanClassPath}.module.${moduleName}.bean.request.${bean};
 @}
 
 @ var now = date();
-@ var name = firstCharToUpperCase(moduleName) + "Service";
+@ var name = "__" + firstCharToUpperCase(moduleName) + "ControllerService__";
 /**
  * Created by `wall.e`(https://github.com/slashchenxiaojun/wall.e) on ${now,'yyyy/MM/dd'}.
  */
@@ -13,23 +14,26 @@ public class ${name} {
 @ for ( api in interfaceList ) {
 @   var beanName = firstCharToUpperCase(api.code) + "Bean";
 @   if ( interfaceParamMap[api.code] != null ) {
-  public void ${api.code}Check(Object ${interfaceParamMap[api.code]}) {
+  /**
+    ${api.description! 'null'}
+   */
+  public void ${api.code}Check(AdamUserBean currentUser, Object ${interfaceParamMap[api.code]}) {
   }
 
   /**
     ${api.result_data! 'null'}
    */
-  public Object ${api.code}Service(Object ${interfaceParamMap[api.code]}) {
+  public Object ${api.code}Service(AdamUserBean currentUser, Object ${interfaceParamMap[api.code]}) {
     return null;
   }
 @   } else {
-  public void ${api.code}Check(${beanName} bean) {
+  public void ${api.code}Check(AdamUserBean currentUser, ${beanName} bean) {
   }
 
   /**
     ${api.result_data! 'null'}
    */
-  public Object ${api.code}Service(${beanName} bean) {
+  public Object ${api.code}Service(AdamUserBean currentUser, ${beanName} bean) {
     return null;
   }
 @   } if ( apiLP.last != true ) { print("\r\n"); }

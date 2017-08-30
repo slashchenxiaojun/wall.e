@@ -4,7 +4,7 @@ package ${classPath}.module.${moduleName}.controller;
 import ${beanClassPath}.module.${moduleName}.bean.request.${bean};
 @}
 @ // 导入service
-@ var serviceName = firstCharToUpperCase(moduleName) + "Service";
+@ var serviceName = "__" + firstCharToUpperCase(moduleName) + "ControllerService__";
 @ var serviceFieldName = moduleName + "Service";
 import ${classPath}.module.${moduleName}.service.${serviceName};
 import com.jfinal.core.ActionKey;
@@ -25,16 +25,16 @@ public class ${className} extends BaseController {
 @     var paramName = interfaceParamMap[api.code];
     Object ${paramName} = getPara();
 
-    ${serviceFieldName}.${api.code}Check(${paramName});
-    Object data = ${serviceFieldName}.${api.code}Service(${paramName});
+    ${serviceFieldName}.${api.code}Check(getCurrentUser(), ${paramName});
+    Object data = ${serviceFieldName}.${api.code}Service(getCurrentUser(), ${paramName});
 
     OK(data);
 @   } else {
     ${beanName} bean = getJson2Bean(${beanName}.class);
     JSR303Validator(bean);
 
-    ${serviceFieldName}.${api.code}Check(bean);
-    Object data = ${serviceFieldName}.${api.code}Service(bean);
+    ${serviceFieldName}.${api.code}Check(getCurrentUser(), bean);
+    Object data = ${serviceFieldName}.${api.code}Service(getCurrentUser(), bean);
 
     OK(data);
 @   }

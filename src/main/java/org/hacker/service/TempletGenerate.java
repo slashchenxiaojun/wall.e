@@ -382,7 +382,7 @@ public class TempletGenerate {
     // 一个目录相当于一个controller
     for (Folder folder : folderList) {
       String moduleName = folder.getName().toLowerCase();
-      String className = StrKit.firstCharToUpperCase(folder.getName()) + "Service";
+      String className = "__" + StrKit.firstCharToUpperCase(folder.getName()) + "ControllerService__";
       String serviceClassPath = classPath +
               File.separator + "module" +
               File.separator + moduleName +
