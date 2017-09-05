@@ -19,7 +19,13 @@ public class ${className} extends BaseController {
 
 @ for ( api in interfaceList ) {
 @   var beanName = firstCharToUpperCase(api.code) + "Bean";
+@   if ( interfaceParamMap[api.code] != null ) {
+@     var index = strutil.length(api.relative_url) - strutil.length(interfaceParamMap[api.code]);
+@     var noBeanUrl = strutil.subStringTo(api.relative_url, 0, index - 4);
+  \@ActionKey("${noBeanUrl}")
+@   } else {
   \@ActionKey("${api.relative_url}")
+@   }
   public void ${api.code}() {
 @   if ( interfaceParamMap[api.code] != null ) {
 @     var paramName = interfaceParamMap[api.code];
