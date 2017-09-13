@@ -118,6 +118,7 @@
 		</dependency>
 	</dependencies>
 	<build>
+		<finalName>walle</finalName>
 		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -135,7 +136,6 @@
 				<version>3.0.0</version>
 				<configuration>
 					<escapeString>\</escapeString>
-					<warName>walle</warName>
 					<webResources>
 						<resource>
 							<directory>src/main/resources</directory>

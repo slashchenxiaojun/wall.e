@@ -221,14 +221,14 @@ public class TempletGenerateTest {
 
   @Test
   public void test_interface_md() {
-    String root = "E:\\P_Gateway_DMServer\\Branch\\StudentApartment\\src\\main";
+    String root = "/Users/mr.j/student_apartment/src/main";
     TempletGenerate tg = new TempletGenerate(root, root, null);
     tg.generateInterfaceMarkdownDoc(10, null);
   }
 
   @Test
   public void test_code_gen() {
-	  String root = "E:\\P_Gateway_DMServer\\Branch\\StudentApartment\\src\\main\\java";
+	  String root = "/Users/mr.j/student_apartment/src/main/java";
     TempletGenerate tg = new TempletGenerate(root, root, null);
     String classPath =
     "walle" + File.separator +
@@ -242,6 +242,20 @@ public class TempletGenerateTest {
 
     // PS: 只有第一次生成的时候才能使用
 //    tg.generateInterfaceServiceCode(10, classPath, beanClassPath, null);
+  }
+
+  @Test
+  public void test_code_service_gen() {
+    String root = "/Users/mr.j/P_Gateway_DMServer/Branch/StudentApartment/src/main/java";
+    TempletGenerate tg = new TempletGenerate(root, root, null);
+    String classPath =
+    "walle" + File.separator +
+    "pstone";
+    String beanClassPath =
+    "walle" + File.separator +
+    "pstone";
+
+    tg.generateInterfaceServiceCode(10, null, classPath, beanClassPath, null);
   }
 
 }

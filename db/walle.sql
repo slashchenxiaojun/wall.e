@@ -1,22 +1,24 @@
 /*
-Navicat MySQL Data Transfer
+ Navicat Premium Data Transfer
 
-Source Server         : 121.41.50.221
-Source Server Version : 50173
-Source Host           : 121.41.50.221:3306
-Source Database       : walle
+ Source Server         : 121.41.50.221
+ Source Server Type    : MySQL
+ Source Server Version : 50173
+ Source Host           : 121.41.50.221
+ Source Database       : walle
 
-Target Server Type    : MYSQL
-Target Server Version : 50173
-File Encoding         : 65001
+ Target Server Type    : MySQL
+ Target Server Version : 50173
+ File Encoding         : utf-8
 
-Date: 2017-08-26 16:28:07
+ Date: 09/13/2017 11:54:14 AM
 */
 
-SET FOREIGN_KEY_CHECKS=0;
+SET NAMES utf8;
+SET FOREIGN_KEY_CHECKS = 0;
 
 -- ----------------------------
--- Table structure for w_db_model
+--  Table structure for `w_db_model`
 -- ----------------------------
 DROP TABLE IF EXISTS `w_db_model`;
 CREATE TABLE `w_db_model` (
@@ -30,10 +32,10 @@ CREATE TABLE `w_db_model` (
   PRIMARY KEY (`id`),
   KEY `fk_w_project_w_model1_idx` (`project_id`),
   CONSTRAINT `fk_w_project_w_model1_idx` FOREIGN KEY (`project_id`) REFERENCES `w_project` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB AUTO_INCREMENT=109 DEFAULT CHARSET=utf8 COMMENT='数据model元数据，通常使用engine为InnoDB\r\n\r\n';
+) ENGINE=InnoDB AUTO_INCREMENT=110 DEFAULT CHARSET=utf8 COMMENT='数据model元数据，通常使用engine为InnoDB\r\n\r\n';
 
 -- ----------------------------
--- Table structure for w_db_model_item
+--  Table structure for `w_db_model_item`
 -- ----------------------------
 DROP TABLE IF EXISTS `w_db_model_item`;
 CREATE TABLE `w_db_model_item` (
@@ -53,10 +55,10 @@ CREATE TABLE `w_db_model_item` (
   PRIMARY KEY (`id`),
   KEY `fk_w_model_item_w_model1_idx` (`w_model_id`),
   CONSTRAINT `fk_w_model_item_w_model1` FOREIGN KEY (`w_model_id`) REFERENCES `w_db_model` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=2252 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=2404 DEFAULT CHARSET=utf8;
 
 -- ----------------------------
--- Table structure for w_db_model_mapping
+--  Table structure for `w_db_model_mapping`
 -- ----------------------------
 DROP TABLE IF EXISTS `w_db_model_mapping`;
 CREATE TABLE `w_db_model_mapping` (
@@ -75,7 +77,7 @@ CREATE TABLE `w_db_model_mapping` (
 ) ENGINE=InnoDB AUTO_INCREMENT=15 DEFAULT CHARSET=utf8;
 
 -- ----------------------------
--- Table structure for w_folder
+--  Table structure for `w_folder`
 -- ----------------------------
 DROP TABLE IF EXISTS `w_folder`;
 CREATE TABLE `w_folder` (
@@ -88,10 +90,10 @@ CREATE TABLE `w_folder` (
   PRIMARY KEY (`id`),
   KEY `fk_w_folder_w_project1_idx` (`w_project_id`),
   CONSTRAINT `fk_w_folder_w_project1` FOREIGN KEY (`w_project_id`) REFERENCES `w_project` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB AUTO_INCREMENT=19 DEFAULT CHARSET=utf8 COMMENT='接口的文件夹-树形结构';
+) ENGINE=InnoDB AUTO_INCREMENT=26 DEFAULT CHARSET=utf8 COMMENT='接口的文件夹-树形结构';
 
 -- ----------------------------
--- Table structure for w_generate
+--  Table structure for `w_generate`
 -- ----------------------------
 DROP TABLE IF EXISTS `w_generate`;
 CREATE TABLE `w_generate` (
@@ -104,10 +106,10 @@ CREATE TABLE `w_generate` (
   PRIMARY KEY (`id`),
   KEY `fk_w_generate_w_db_model1_idx` (`w_model_id`),
   CONSTRAINT `fk_w_generate_w_db_model1` FOREIGN KEY (`w_model_id`) REFERENCES `w_db_model` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=98 DEFAULT CHARSET=utf8 COMMENT='目录结构由 包路径 + 模块 构成';
+) ENGINE=InnoDB AUTO_INCREMENT=99 DEFAULT CHARSET=utf8 COMMENT='目录结构由 包路径 + 模块 构成';
 
 -- ----------------------------
--- Table structure for w_interface
+--  Table structure for `w_interface`
 -- ----------------------------
 DROP TABLE IF EXISTS `w_interface`;
 CREATE TABLE `w_interface` (
@@ -126,10 +128,10 @@ CREATE TABLE `w_interface` (
   KEY `fk_w_interface_w_folder1_idx` (`w_folder_id`),
   CONSTRAINT `fk_w_interface_w_folder1` FOREIGN KEY (`w_folder_id`) REFERENCES `w_folder` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_w_interface_w_project` FOREIGN KEY (`w_project_id`) REFERENCES `w_project` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB AUTO_INCREMENT=16 DEFAULT CHARSET=utf8 COMMENT='接口是WALL-E的核心，所有接口都是归于某个项目，接口与项目是ManyToOne的关系则';
+) ENGINE=InnoDB AUTO_INCREMENT=73 DEFAULT CHARSET=utf8 COMMENT='接口是WALL-E的核心，所有接口都是归于某个项目，接口与项目是ManyToOne的关系则';
 
 -- ----------------------------
--- Table structure for w_interface_log
+--  Table structure for `w_interface_log`
 -- ----------------------------
 DROP TABLE IF EXISTS `w_interface_log`;
 CREATE TABLE `w_interface_log` (
@@ -145,7 +147,7 @@ CREATE TABLE `w_interface_log` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='记录一天中或者某个时间段中接口的访问次数，和平均时长，或其他参数';
 
 -- ----------------------------
--- Table structure for w_parameter
+--  Table structure for `w_parameter`
 -- ----------------------------
 DROP TABLE IF EXISTS `w_parameter`;
 CREATE TABLE `w_parameter` (
@@ -164,11 +166,11 @@ CREATE TABLE `w_parameter` (
   `w_interface_id` int(11) NOT NULL,
   PRIMARY KEY (`id`),
   KEY `fk_w_parameter_w_interface1_idx` (`w_interface_id`),
-  CONSTRAINT `fk_w_parameter_w_interface1` FOREIGN KEY (`w_interface_id`) REFERENCES `w_interface` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB AUTO_INCREMENT=126 DEFAULT CHARSET=utf8 COMMENT='接口的参数，与接口是oneToMany的关系，参数是为了满足前后端效验一致而产生的';
+  CONSTRAINT `fk_w_parameter_w_interface1` FOREIGN KEY (`w_interface_id`) REFERENCES `w_interface` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=744 DEFAULT CHARSET=utf8 COMMENT='接口的参数，与接口是oneToMany的关系，参数是为了满足前后端效验一致而产生的';
 
 -- ----------------------------
--- Table structure for w_project
+--  Table structure for `w_project`
 -- ----------------------------
 DROP TABLE IF EXISTS `w_project`;
 CREATE TABLE `w_project` (
@@ -184,7 +186,7 @@ CREATE TABLE `w_project` (
 ) ENGINE=InnoDB AUTO_INCREMENT=12 DEFAULT CHARSET=utf8 COMMENT='项目是承载api接口的载体，一个项目可以拥有多个接口';
 
 -- ----------------------------
--- Table structure for w_result_data
+--  Table structure for `w_result_data`
 -- ----------------------------
 DROP TABLE IF EXISTS `w_result_data`;
 CREATE TABLE `w_result_data` (
@@ -197,3 +199,5 @@ CREATE TABLE `w_result_data` (
   KEY `fk_w_result_data_w_interface1_idx` (`w_interface_id`),
   CONSTRAINT `fk_w_result_data_w_interface1` FOREIGN KEY (`w_interface_id`) REFERENCES `w_interface` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+SET FOREIGN_KEY_CHECKS = 1;

@@ -27,7 +27,7 @@ public class PluginFactory {
 		dp.start();
 		arp.start();
 	}
-	
+
 	/**
 	 * 获取play.properties的配置
 	 * @param key

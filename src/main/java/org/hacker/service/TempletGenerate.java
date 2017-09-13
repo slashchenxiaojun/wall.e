@@ -343,6 +343,10 @@ public class TempletGenerate {
         // 没有参数
         boolean isUrlParam = false;
         String url = anInterface.getRelativeUrl();
+        if ( StrKit.isBlank(url) ) {
+          System.err.println(String.format("接口[%s:(%s)]没有填写url", anInterface.getName(), anInterface.getCode()));
+          continue;
+        }
         isUrlParam = url.matches(".*/\\$\\{[A-Za-z_]+\\}$");
         if ( StrKit.notBlank(anInterface.getCode()) && isUrlParam ) {
           int start = url.indexOf("/${");
@@ -367,9 +371,17 @@ public class TempletGenerate {
     System.out.println("############Generate interface controller code success############");
   }
 
-  // 用户编写业务代码的service，为了防止生成controller和bean代码不被覆盖
-  // 这个方法在被调用时，需要做一次密码身份认证，以免菜鸟勿用
-  public void generateInterfaceServiceCode(Object projectId, String classPath, String beanClassPath, String templatePath) {
+  /**
+   * 用户编写业务代码的service，为了防止生成controller和bean代码不被覆盖
+   * 这个方法在被调用时，需要做一次密码身份认证，以免菜鸟勿用
+   *
+   * @param projectId 项目id
+   * @param folderId 如果有该数据，只生成当前的目录接口的service，其他忽略
+   * @param classPath 生成代码的路径
+   * @param beanClassPath 相关bean代码的路径
+   * @param templatePath 使用的模版
+   */
+  public void generateInterfaceServiceCode(Object projectId, Object folderId, String classPath, String beanClassPath, String templatePath) {
     if(StrKit.isBlank(templatePath)) templatePath = MAVEN_BASE + "gen/web/4interfaceServiceTemp00.btl";
     Template t_service = gt.getTemplate(templatePath);
 
@@ -381,6 +393,10 @@ public class TempletGenerate {
 
     // 一个目录相当于一个controller
     for (Folder folder : folderList) {
+      // 忽略其他folder目录下的service生成请求
+      if ( !(folderId != null && folderId.equals(folder.getId())) ) {
+        continue;
+      }
       String moduleName = folder.getName().toLowerCase();
       String className = "__" + StrKit.firstCharToUpperCase(folder.getName()) + "ControllerService__";
       String serviceClassPath = classPath +
