@@ -45,7 +45,7 @@ import java.util.Date;
 @ }
 @ var now = date();
 /**
- * Created by `wall.e`(https://github.com/slashchenxiaojun/wall.e) on ${now,'yyyy/MM/dd'}.
+ * Created by `wall.e`(https://github.com/slashchenxiaojun/wall.e).
  */
 public class ${className} {
 @ for ( p in parameterList ) {

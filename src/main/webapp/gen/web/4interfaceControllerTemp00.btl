@@ -12,7 +12,7 @@ import org.hacker.core.BaseController;
 
 @ var now = date();
 /**
- * Created by `wall.e`(https://github.com/slashchenxiaojun/wall.e) on ${now,'yyyy/MM/dd'}.
+ * Created by `wall.e`(https://github.com/slashchenxiaojun/wall.e).
  */
 public class ${className} extends BaseController {
   ${serviceName} ${serviceFieldName} = new ${serviceName}();
