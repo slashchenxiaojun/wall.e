@@ -36,12 +36,16 @@ public class ${className} extends BaseController {
     Object data = ${serviceFieldName}.${api.code}Service(getCurrentUser(), ${paramName});
 
     OK(data);
-@   } else {
+@   } else if ( noParaminterfaceMap[api.code] == null ) { // 有参数的使用bean解析模版
     ${beanName} bean = getJson2Bean(${beanName}.class);
     JSR303Validator(bean);
 
     ${serviceFieldName}.${api.code}Check(getCurrentUser(), bean);
     Object data = ${serviceFieldName}.${api.code}Service(getCurrentUser(), bean);
+
+    OK(data);
+@   } else { // 使用无参数模版
+    Object data = ${serviceFieldName}.${api.code}Service(getCurrentUser());
 
     OK(data);
 @   }

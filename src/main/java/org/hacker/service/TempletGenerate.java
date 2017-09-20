@@ -335,10 +335,14 @@ public class TempletGenerate {
        * xx 就是接口的code
        */
       Map<String, String> interfaceParamMap = new HashMap<>();
+      // 没有参数的接口map
+      Map<String, String> noParaminterfaceMap = new HashMap<>();
       for (Interface anInterface : interfaceList) {
         boolean hasBean = Db.findFirst("SELECT COUNT(1) FROM w_parameter WHERE w_interface_id = ?", anInterface.getId()).getLong("COUNT(1)") > 0;
         if ( StrKit.notBlank(anInterface.getCode()) && hasBean ) {
           beanNameList.add(StrKit.firstCharToUpperCase(anInterface.getCode()) + "Bean");
+        } else {
+          noParaminterfaceMap.put( anInterface.getCode(), "no bean" );
         }
         // 没有参数
         boolean isUrlParam = false;
@@ -360,6 +364,7 @@ public class TempletGenerate {
       t_controller.binding("interfaceParamMap", interfaceParamMap);
       t_controller.binding("beanNameList", beanNameList);
       t_controller.binding("interfaceList", interfaceList);
+      t_controller.binding("noParaminterfaceMap", noParaminterfaceMap);
 
       System.out.println(file.getAbsolutePath());
       try {
