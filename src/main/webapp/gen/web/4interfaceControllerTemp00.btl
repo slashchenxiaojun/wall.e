@@ -45,6 +45,7 @@ public class ${className} extends BaseController {
 
     OK(data);
 @   } else { // 使用无参数模版
+    ${serviceFieldName}.${api.code}Check(getCurrentUser());
     Object data = ${serviceFieldName}.${api.code}Service(getCurrentUser());
 
     OK(data);

@@ -164,7 +164,7 @@ i {
                 <input name="param.format" type="text" placeholder="" class="layui-input" value="${p.format}">
               </td>
               <td>
-                <input name="param.require" type="hidden">
+                <input name="param.require" type="hidden" value="${p.require}">
                 <input type="checkbox" placeholder="" class="layui-input" lay-skin="switch" lay-filter="required" @if(p.require == true) { print("checked"); }
                 >
               </td>
