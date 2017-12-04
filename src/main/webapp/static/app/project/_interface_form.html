@@ -38,11 +38,10 @@ i {
         <form class="layui-form" style="padding: 20px 70px 0 40px;">
           <div class="layui-form-item">
             <label class="layui-form-label">接口名称</label>
-            <label class="layui-form-label" style="padding-left: 0px;text-align: left;width: 78%;">${interface.name}</label>
             <div class="layui-input-block">
               <input type="hidden" name="project.id" class="layui-input">
               <input type="hidden" name="interface.id" class="layui-input" value="${interface.id}">
-              <input type="hidden" name="interface.name" class="layui-input" value="${interface.name}">
+              <input type="text" name="interface.name" class="layui-input" value="${interface.name}">
             </div>
           </div>
 

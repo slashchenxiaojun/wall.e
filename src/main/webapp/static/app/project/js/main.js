@@ -1,6 +1,6 @@
 form = null;
 layui.use(['layer', 'form'], function() {
-  var 
+  var
   $ = layui.jquery,
   tree = layui.tree,
   layer = layui.layer;
@@ -25,7 +25,7 @@ layui.use(['layer', 'form'], function() {
   $('select[name="project"]').find('option[value=' + projectId + ']').attr('selected', true);
   form.render();
   // ---------init---------
-  
+
   // 重新初始化ZTree,select[name="type"]
   form.on('select(project)', function(data){
     var url = window.location.href.substr(0, window.location.href.indexOf('?')) + '?projectId=' + data.value;
@@ -33,7 +33,7 @@ layui.use(['layer', 'form'], function() {
   });
 
   form.on('select(type)', function(data){
-    
+
   });
 
   $('.create-folder').on('click', function(){
@@ -64,7 +64,7 @@ $(function() {
   project_id = project_id.split('=')[1];
   if (project_id == undefined) project_id = 1;
   $('body').attr('project-id', project_id);
-  
+
   $.when($.getJSON(Global.base + '/project/getTreeFolder', {'project.id': project_id}))
   .done(function(r) {
     if(r.code == 0) {
@@ -111,7 +111,7 @@ $(function() {
       icon.attr('style', null);
     });
   });
-  
+
   $(document).on('click', '.setting', function(e){
     var interfaceId = $(this).parent().parent().attr('data-id');
     var settingIndex = layer.open({
@@ -149,14 +149,22 @@ $(function() {
 //    });
   });
 
-  $(document).on('click', '.result', function(e){
+  $(document).on('click', '.copy', function(e){
     var interfaceId = $(this).parent().parent().attr('data-id');
-    layer.open({
-      type: 2,
-      area: ['700px', '530px'],
-      fixed: false, //不固定
-      maxmin: true,
-      content: Global.base + '/project/interfaceData?projectId=' + $('body').attr('project-id') + '&interfaceId=' + interfaceId
+    layer.confirm('确认要复制接口吗?', {icon: 3, title:'提示'}, function(index) {
+      $.when($.getJSON(Global.base + '/project/duplicateInterface', {
+        'interface.id': interfaceId,
+        'project.id': $('body').attr('project-id'),
+        'folder.id': $('#interface_tree').attr('folder-id')
+      })).done(function(r) {
+        if(r.code == 0) {
+          // 刷新table
+          renderInterfaceTable(r.data);
+        } else {
+          layer.msg('复制接口失败(' + r.msg + ')');
+        }
+      });
+      layer.close(index);
     });
   });
 
@@ -170,15 +178,17 @@ $(function() {
       content: Global.base + '/project/interfaceSimulationData?projectId=' + $('body').attr('project-id') + '&interfaceId=' + interfaceId
     });
   });
-  
+
   // -----
   var zTreeOnRightClick = function(event, treeId, treeNode) {
     if(treeNode.interface_id != null) {
       $('#interface_tree').attr('folder-id', null);
       $('#interface_tree').attr('interface-id', treeNode.interface_id);
+      $('#interface_tree').attr('interface-name', treeNode.name);
     } else {
       $('#interface_tree').attr('folder-id', treeNode.folder_id);
       $('#interface_tree').attr('interface-id', null);
+      $('#interface_tree').attr('interface-name', null);
     }
     collectionEvent();
     interfaceEvent();
@@ -229,7 +239,7 @@ $(function() {
         + '<td class="operation">'
         + '<i class="layui-icon layui-anim layui-anim-rotate layui-anim-loop test">&#xe623;</i>' //
         + '<i class="layui-icon setting">&#xe620;</i>'
-//        + '<i class="layui-icon result">&#xe60e;</i>'
+        + '<i class="layui-icon copy">&#xe630;</i>'
 //        + '<i class="layui-icon simulation">&#xe60b;</i>'
         + '</td></tr>';
         $('.interfaceTable').append(tr);
@@ -241,7 +251,7 @@ $(function() {
       + '<td class="operation">'
       + '<i class="layui-icon layui-anim layui-anim-rotate layui-anim-loop test">&#xe623;</i>' //
       + '<i class="layui-icon setting">&#xe620;</i>'
-//      + '<i class="layui-icon result">&#xe60e;</i>'
+      // + '<i class="layui-icon copy">&#xe630;</i>'
 //      + '<i class="layui-icon simulation">&#xe60b;</i>'
       + '</td></tr>';
       $('.interfaceTable').append(tr);
@@ -312,7 +322,7 @@ $(function() {
         header: '接口管理'
       },
       {
-        text: '新增接口', 
+        text: '新增接口',
         target:'_blank',
         action: function(e) {
           e.preventDefault();
@@ -338,59 +348,62 @@ $(function() {
     ]);
   }
   // 接口的右键列表
-  var interfaceEvent = context.attach('#interface_tree li a.level1', [
-    {
-      header: '接口管理'
-    },
-    {
-      text: '重命名接口',
-      target:'_blank',
-      action: function(e) {
-        e.preventDefault();
-        layer.prompt({
-          title: '请输入接口名称',
-          area: ['400px', '50px'] //自定义文本域宽高
-        }, function(value, index, elem){
-          var interfaceId = $('#interface_tree').attr('interface-id');
-          $.when($.getJSON(Global.base + '/project/renameInterface', {
-            'project.id': $('body').attr('project-id'),
-            'interface.id': interfaceId,
-            'interface.name': value
-          })).done(function(r) {
-            if(r.code == 0) {
-              window.location.reload();
-            } else {
-              layer.msg('保存失败(' + r.msg + ')');
-            }
-          });
-        });
-      }
-    },
-    {
-      text: '删除接口',
-      target:'_blank',
+  var interfaceEvent = 
+    context.attach('#interface_tree li a.level1', [
+      {
+        header: '接口管理'
+      },
+      {
+        text: '重命名接口',
+        target:'_blank',
         action: function(e) {
           e.preventDefault();
-          layer.confirm('确定删除该接口吗?', {
-            icon: 3, title:'删除'
+          layer.prompt({
+            value: $('#interface_tree').attr('interface-name'),
+            title: '请输入接口名称',
+            area: ['400px', '50px'] //自定义文本域宽高
           }, function(value, index, elem){
-            var interface_id = $('#interface_tree').attr('interface-id');
-            if(interface_id == null || interface_id == '') {
-              layer.msg('请选择接口');
-              return;
-            }
-            $.when($.getJSON(Global.base + '/project/deteleInterface', {
-              'interface.id': interface_id
+            var interfaceId = $('#interface_tree').attr('interface-id');
+            $.when($.getJSON(Global.base + '/project/renameInterface', {
+              'project.id': $('body').attr('project-id'),
+              'interface.id': interfaceId,
+              'interface.name': value
             })).done(function(r) {
               if(r.code == 0) {
                 window.location.reload();
               } else {
-                layer.msg('删除失败');
+                layer.msg('保存失败(' + r.msg + ')');
               }
             });
           });
         }
-    }
-  ]);
+      },
+      {
+        text: '删除接口',
+        target:'_blank',
+          action: function(e) {
+            e.preventDefault();
+            layer.confirm('确定删除该接口吗?', {
+              icon: 3, title:'删除'
+            }, function(value, index, elem){
+              var interface_id = $('#interface_tree').attr('interface-id');
+              if(interface_id == null || interface_id == '') {
+                layer.msg('请选择接口');
+                return;
+              }
+              $.when($.getJSON(Global.base + '/project/deteleInterface', {
+                'interface.id': interface_id
+              })).done(function(r) {
+                if(r.code == 0) {
+                  window.location.reload();
+                } else {
+                  layer.msg('删除失败');
+                }
+              });
+            });
+          }
+      }
+    ]);
+  
   // ----
 });
