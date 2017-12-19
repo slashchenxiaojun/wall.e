@@ -1,11 +1,8 @@
 package org.hacker.service;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.util.*;
-import java.util.regex.Matcher;
-
+import com.jfinal.kit.StrKit;
+import com.jfinal.plugin.activerecord.Db;
+import com.jfinal.plugin.activerecord.Record;
 import org.beetl.core.Configuration;
 import org.beetl.core.GroupTemplate;
 import org.beetl.core.Template;
@@ -16,9 +13,11 @@ import org.hacker.module.common.FileKit;
 import org.hacker.mvc.model.*;
 import org.hacker.mvc.view.*;
 
-import com.jfinal.kit.StrKit;
-import com.jfinal.plugin.activerecord.Db;
-import com.jfinal.plugin.activerecord.Record;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.util.*;
+import java.util.regex.Matcher;
 
 /**
  * 使用beetl生成模板
@@ -444,6 +443,70 @@ public class TempletGenerate {
     System.out.println("############Generate interface service code success############");
   }
 
+  public void generateInterfaceRequestBeanCodeById(Object interfaceId, String moduleName, String classPath, String templatePath) {
+    if ( StrKit.isBlank(templatePath) ) templatePath = MAVEN_BASE + "gen/web/4interfaceBeanTemp00.btl";
+    Template t_bean = gt.getTemplate(templatePath);
+
+    Interface anInterface = Interface.dao.findById(interfaceId);
+
+    String beanClassPath = classPath +
+            File.separator + "module" +
+            File.separator + moduleName +
+            File.separator + "bean" +
+            File.separator + "request";
+
+    if ( anInterface == null ) return;
+    if ( StrKit.notBlank(anInterface.getCode()) ) {
+      String className = StrKit.firstCharToUpperCase(anInterface.getCode()) + "Bean";
+      // 参数
+      List<Parameter> parameterList = Parameter.dao.find("SELECT * FROM w_parameter WHERE w_interface_id = ? order by seq asc", anInterface.getId());
+      // 没有参数就不生成空的bean文件
+      if ( parameterList != null && parameterList.size() == 0 ) return;
+
+      t_bean.binding("classPath", classPath.replaceAll(Matcher.quoteReplacement(File.separator), "."));
+      t_bean.binding("className", className);
+      t_bean.binding("moduleName", moduleName);
+      t_bean.binding("anInterface", anInterface);
+      t_bean.binding("parameterList", parameterList);
+      // 如果有enum类型，生成枚举类
+      // 如果有array类型，添加需要导入的class
+      Set<String> arrayExpandClass = new HashSet<>();
+      for ( Parameter parameter : parameterList ) {
+        if ( parameter.getType().equals("enum") && StrKit.notBlank(parameter.getEnumValue()) ) {
+          String enumClassName = StrKit.firstCharToUpperCase(parameter.getName());
+          String[] enumValues = parameter.getEnumValue().split(",");
+          // 这里可以优化一下去掉前后的空格
+          Template enum_temp = gt.getTemplate(MAVEN_BASE + "gen/pojo/4beanEnum.btl");
+          enum_temp.binding("classPath", classPath.replaceAll(Matcher.quoteReplacement(File.separator), "."));
+          enum_temp.binding("moduleName", moduleName);
+          enum_temp.binding("enumClassName", enumClassName);
+          enum_temp.binding("enumValues", enumValues);
+          File file = getConfigGenerateFile(beanClassPath, enumClassName + ".java");
+          System.out.println(file.getAbsolutePath());
+          try {
+            FileKit.write(enum_temp.render(), file);
+          } catch ( Exception e ) {
+            e.printStackTrace();
+          }
+        }
+        if ( parameter.getType().equals("array") && StrKit.notBlank(parameter.getArrayType()) ) {
+          if ( parameter.getArrayType().equalsIgnoreCase("JsonObject") ) {
+            arrayExpandClass.add("com.alibaba.fastjson.JSONObject");
+          }
+        }
+      }
+      t_bean.binding("arrayExpandClass", arrayExpandClass);
+
+      File file = getConfigGenerateFile(beanClassPath, className + ".java");
+      System.out.println(file.getAbsolutePath());
+      try {
+        FileKit.write(t_bean.render(), file);
+      } catch ( Exception e ) {
+        e.printStackTrace();
+      }
+    }
+  }
+
   public void generateInterfaceRequestBeanCode(Object projectId, String classPath, String templatePath) {
     if ( StrKit.isBlank(templatePath) ) templatePath = MAVEN_BASE + "gen/web/4interfaceBeanTemp00.btl";
     Template t_bean = gt.getTemplate(templatePath);
@@ -500,7 +563,7 @@ public class TempletGenerate {
               }
             }
             if ( parameter.getType().equals("array") && StrKit.notBlank(parameter.getArrayType()) ) {
-              if (parameter.getArrayType().equalsIgnoreCase("JsonObject")) {
+              if ( parameter.getArrayType().equalsIgnoreCase("JsonObject") ) {
                 arrayExpandClass.add("com.alibaba.fastjson.JSONObject");
               }
             }

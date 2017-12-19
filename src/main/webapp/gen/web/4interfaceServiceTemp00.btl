@@ -3,20 +3,16 @@ package ${classPath}.module.${moduleName}.service;
 import cc.pstone.common.AdamUserBean;
 @ for( bean in beanNameList ) {
 import ${beanClassPath}.module.${moduleName}.bean.request.${bean};
-@}
+@ }
 
-@ var now = date();
 @ var name = "__" + firstCharToUpperCase(moduleName) + "ControllerService__";
 /**
- * Created by `wall.e`(https://github.com/slashchenxiaojun/wall.e) on ${now,'yyyy/MM/dd'}.
+ * Created by `wall.e`(https://github.com/slashchenxiaojun/wall.e)
  */
 public class ${name} {
 @ for ( api in interfaceList ) {
 @   var beanName = firstCharToUpperCase(api.code) + "Bean";
 @   if ( interfaceParamMap[api.code] != null ) {
-  /**
-    ${api.description! 'null'}
-   */
   public void ${api.code}Check(AdamUserBean currentUser, Object ${interfaceParamMap[api.code]}) {
   }
 
@@ -27,6 +23,11 @@ public class ${name} {
     return null;
   }
 @   } else {
+@       var haveBean = false;
+@       for( bean in beanNameList ) {
+@           if ( bean == beanName ) haveBean = true;
+@       }
+@       if ( haveBean ) {
   public void ${api.code}Check(AdamUserBean currentUser, ${beanName} bean) {
   }
 
@@ -36,6 +37,17 @@ public class ${name} {
   public Object ${api.code}Service(AdamUserBean currentUser, ${beanName} bean) {
     return null;
   }
+@           } else {
+  public void ${api.code}Check(AdamUserBean currentUser) {
+  }
+
+  /**
+    ${api.result_data! 'null'}
+   */
+  public Object ${api.code}Service(AdamUserBean currentUser) {
+    return null;
+  }
+@           }
 @   } if ( apiLP.last != true ) { print("\r\n"); }
 @ }
 }

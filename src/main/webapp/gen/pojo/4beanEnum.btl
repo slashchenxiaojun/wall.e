@@ -1,8 +1,7 @@
 package ${classPath}.module.${moduleName}.bean.request;
 
-@ var now = date();
 /**
- * Created by `wall.e`(https://github.com/slashchenxiaojun/wall.e) on ${now,'yyyy/MM/dd'}.
+ * Created by `wall.e`(https://github.com/slashchenxiaojun/wall.e)
  */
 public enum ${enumClassName} {
 @ for ( v in enumValues ) {

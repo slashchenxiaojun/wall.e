@@ -32,6 +32,7 @@ public class ProjectController extends BaseController {
 
   public void index() {
     setAttr("projects", Project.dao.find("select * from w_project"));
+    setAttr("projectId", getPara("projectId"));
   }
 
   public void folderForm() {

@@ -56,7 +56,7 @@ public class ${className} {
 @   var type = toJavaType( p.type, (p.type == "enum" ? p.name : p.array_type) );
 @   var paramName = firstCharToLowerCase(p.name);
 @ if ( p.type == "string" && p.max != null ) { print("  @Length(max = " + p.max + ")\r\n"); }
-@ if ( p.type == "string" && p.format != null ) { print("  @Pattern(regexp=\"" + p.format + "\")\r\n"); }
+@ if ( p.type == "string" && p.format != null ) { print("  @Pattern(regexp=\"" + p.format + "\", message = \"" + p.remarks + "格式错误\")\r\n"); }
   private ${type} ${paramName};
 @ }
 

@@ -10,14 +10,13 @@
 <link href="static/module/contextjs/css/context.standalone.css" rel="stylesheet">
 </head>
 <body project-id="">
-
 	<div class="header">
     <form class="layui-form layui-main">
     	<div class="layui-inline">
 			  <select name="project" lay-verify="required" lay-filter="project">
 			    <option value="">选择项目</option>
           @for(pro in projects) {
-            <option value="${pro.id}" pattern="${pro.pattern}" @if(proLP.first){print("selected");}
+            <option value="${pro.id}" pattern="${pro.pattern}" @if(pro.id == projectId){print("selected");}
 >${pro.name}</option>
           @}
 			  </select>
