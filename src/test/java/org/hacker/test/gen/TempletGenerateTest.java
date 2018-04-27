@@ -1,11 +1,7 @@
 package org.hacker.test.gen;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.regex.Matcher;
-
+import com.jfinal.plugin.activerecord.Db;
+import com.jfinal.plugin.activerecord.Record;
 import org.beetl.core.Configuration;
 import org.beetl.core.GroupTemplate;
 import org.beetl.core.Template;
@@ -22,95 +18,96 @@ import org.hacker.service.TempletGenerate;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import com.jfinal.plugin.activerecord.Db;
-import com.jfinal.plugin.activerecord.Record;
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class TempletGenerateTest {
-	protected static GroupTemplate gt;
+  protected static GroupTemplate gt;
 
-	@BeforeClass
-	public static void init() throws IOException {
-		WebAppResourceLoader resourceLoader = new WebAppResourceLoader();
-		String root = "E:\\workspace\\WALL-E\\src\\main\\webapp";
-		resourceLoader.setRoot(root);
-		Configuration cfg = Configuration.defaultConfiguration();
+  @BeforeClass
+  public static void init() throws IOException {
+    WebAppResourceLoader resourceLoader = new WebAppResourceLoader();
+    String root = "E:\\workspace\\WALL-E\\src\\main\\webapp";
+    resourceLoader.setRoot(root);
+    Configuration cfg = Configuration.defaultConfiguration();
 
-		gt = new GroupTemplate(resourceLoader, cfg);
+    gt = new GroupTemplate(resourceLoader, cfg);
 
-		PluginFactory.startActiveRecordPlugin();
-	}
+    PluginFactory.startActiveRecordPlugin();
+  }
+
+  //	@Test
+  public void test_quest() {
+    TempletGenerate tg = new TempletGenerate(
+            "E:\\workspace\\gen_web\\src\\main\\java",
+            "E:\\workspace\\gen_web\\src\\main\\java",
+            "walle");
+    tg.quickGenerate(1, "test");
+  }
 
 //	@Test
-	public void test_quest() {
-	  TempletGenerate tg = new TempletGenerate(
-	      "E:\\workspace\\gen_web\\src\\main\\java",
-	      "E:\\workspace\\gen_web\\src\\main\\java",
-	      "walle");
-	  tg.quickGenerate(1, "test");
-	}
 
-//	@Test
-	/**
-	 * 数据表的关系
-	 * master 和 slaves
-	 * master - slaves - onoToOne
-	 * 在slaves中添加master的外键
-	 * master - slaves - onoToMany
-	 * 在slaves中添加master的外键
-	 * master - slaves - ManyToMany
-	 * 生成中间表mp_master_slaves，并添加master和slaves的外键
-	 *
-	 * 坚持单表是否需要中间表
-	 * 需要查看是否包含ManyToMany的slaves
-	 * select * from w_db_model_mapping where master_id = 3
-	 * 如果包含有ManyToMany的slaves就生成中间表
-	 *
-	 *
-	 */
-	public void test_db() {
-		int id = 3;
-		DbModel model = DbModel.dao.findById(id);
-		List<DbModelItem> columns = DbModelItem.dao.find("select * from w_db_model_item where w_model_id = ? order by serial", id);
+  /**
+   * 数据表的关系
+   * master 和 slaves
+   * master - slaves - onoToOne
+   * 在slaves中添加master的外键
+   * master - slaves - onoToMany
+   * 在slaves中添加master的外键
+   * master - slaves - ManyToMany
+   * 生成中间表mp_master_slaves，并添加master和slaves的外键
+   * <p>
+   * 坚持单表是否需要中间表
+   * 需要查看是否包含ManyToMany的slaves
+   * select * from w_db_model_mapping where master_id = 3
+   * 如果包含有ManyToMany的slaves就生成中间表
+   */
+  public void test_db() {
+    int id = 3;
+    DbModel model = DbModel.dao.findById(id);
+    List<DbModelItem> columns = DbModelItem.dao.find("select * from w_db_model_item where w_model_id = ? order by serial", id);
 
-		// 查寻出跟自己相关的从表
-		List<DbModelMapping> slaves = DbModelMapping.dao.find("select * from w_db_model_mapping where master_id = ?", id);
-		// 查询出跟自己相关的主表
-		List<Record> master = Db.find("select t1.*, b.length, b.type from (select * from w_db_model_mapping where slaves_id = ?) t1, w_db_model_item b where b.w_model_id = t1.master_id and b.`name` = t1.mapping_foreign_key", id);
+    // 查寻出跟自己相关的从表
+    List<DbModelMapping> slaves = DbModelMapping.dao.find("select * from w_db_model_mapping where master_id = ?", id);
+    // 查询出跟自己相关的主表
+    List<Record> master = Db.find("select t1.*, b.length, b.type from (select * from w_db_model_mapping where slaves_id = ?) t1, w_db_model_item b where b.w_model_id = t1.master_id and b.`name` = t1.mapping_foreign_key", id);
 
-		// 当且仅当相关从表中含有ManyToMany关系时生成中间表
-		List<DbModelMapping> mapping = new ArrayList<>();
-		for(DbModelMapping mm : slaves) {
-			if(mm.getMappingSchema().equals("ManyToMany")) {
-				mapping.add(mm);
-			}
-		}
-		// 当且仅当相关主表中含有oneToMany关系时需要生成外键
-		List<Record> foreign = new ArrayList<>();
-		for(Record mm : master) {
-			if(mm.getStr("mapping_schema").equals("oneToMany")) {
-				foreign.add(mm);
-			}
-		}
+    // 当且仅当相关从表中含有ManyToMany关系时生成中间表
+    List<DbModelMapping> mapping = new ArrayList<>();
+    for ( DbModelMapping mm : slaves ) {
+      if ( mm.getMappingSchema().equals("ManyToMany") ) {
+        mapping.add(mm);
+      }
+    }
+    // 当且仅当相关主表中含有oneToMany关系时需要生成外键
+    List<Record> foreign = new ArrayList<>();
+    for ( Record mm : master ) {
+      if ( mm.getStr("mapping_schema").equals("oneToMany") ) {
+        foreign.add(mm);
+      }
+    }
 
-		Template t2 = gt.getTemplate("gen/db/4mysqldb.btl");
+    Template t2 = gt.getTemplate("gen/db/4mysqldb.btl");
 
-		t2.binding("db", "test");
-		t2.binding("model", model);
-		t2.binding("columns", columns);
+    t2.binding("db", "test");
+    t2.binding("model", model);
+    t2.binding("columns", columns);
 //		t2.binding("module", "movie");
 
-		t2.binding("mapping", mapping);
-		t2.binding("foreign", foreign);
+    t2.binding("mapping", mapping);
+    t2.binding("foreign", foreign);
 
-		System.out.println(t2.render());
+    System.out.println(t2.render());
 //		String[] sqls = t2.render().split(";");
 //		for(String sql : sqls) {
 //			if(StrKit.isBlank(sql)) continue;
 //			Db.update(sql);
 //		}
-	}
+  }
 
-//	@Test
+  //	@Test
   public void test_pojo() {
     // 基础目录
 //    String basePath = "";
@@ -144,10 +141,10 @@ public class TempletGenerateTest {
     System.out.println(t.render());
   }
 
-//	@Test
-	public void test_controller() {
-	  int id = 3;
-	  gt.registerFunction("firstCharToLowerCase", new FirstCharToLowerCase());
+  //	@Test
+  public void test_controller() {
+    int id = 3;
+    gt.registerFunction("firstCharToLowerCase", new FirstCharToLowerCase());
     DbModel model = DbModel.dao.findById(id);
     List<DbModelItem> columns = DbModelItem.dao.find("select * from w_db_model_item where w_model_id = ? order by serial", id);
     Generate generate = Generate.dao.findFirst("select * from w_generate where w_model_id = ?", id);
@@ -167,10 +164,10 @@ public class TempletGenerateTest {
     // 是否使用驼峰命名
     t.binding("camelName", true);
     System.out.println(t.render());
-	}
+  }
 
-//	@Test
-	public void test_service() {
+  //	@Test
+  public void test_service() {
     int id = 3;
     gt.registerFunction("firstCharToLowerCase", new FirstCharToLowerCase());
     DbModel model = DbModel.dao.findById(id);
@@ -194,7 +191,7 @@ public class TempletGenerateTest {
     System.out.println(t.render());
   }
 
-//	@Test
+  //	@Test
   public void test_sqlmd() {
     int id = 3;
     gt.registerFunction("firstCharToLowerCase", new FirstCharToLowerCase());
@@ -227,35 +224,57 @@ public class TempletGenerateTest {
   }
 
   @Test
-  public void test_code_gen() {
-	  String root = "/Users/mr.j/student_apartment/src/main/java";
+  public void test_code_gen_apartment() {
+    String root = "/Users/mr.j/student_apartment/src/main/java";
     TempletGenerate tg = new TempletGenerate(root, root, null);
-    String classPath =
-    "walle" + File.separator +
-    "pstone";
-    String beanClassPath =
-    "walle" + File.separator +
-    "pstone";
+    String classPath = "walle" + File.separator + "pstone";
+    String beanClassPath = "walle" + File.separator + "pstone";
 
     tg.generateInterfaceControllerCode(10, classPath, beanClassPath, null);
     tg.generateInterfaceRequestBeanCode(10, beanClassPath, null);
-
-    // PS: 只有第一次生成的时候才能使用
-//    tg.generateInterfaceServiceCode(10, classPath, beanClassPath, null);
   }
 
   @Test
+  public void test_code_gen_eva() {
+    String root = "/Users/mr.j/adam/eva/src/main/java";
+    TempletGenerate tg = new TempletGenerate(root, root, null);
+    String classPath = "cc" + File.separator + "pstone";
+    String beanClassPath = "cc" + File.separator + "pstone";
+
+    tg.generateInterfaceControllerCode(12, classPath, beanClassPath, null);
+    tg.generateInterfaceRequestBeanCode(12, beanClassPath, null);
+  }
+
+  @Test
+  public void test_code_gen_app_home() {
+    String root = "/Users/mr.j/app_home/src/main/java";
+    TempletGenerate tg = new TempletGenerate(root, root, null);
+    String classPath = "cc" + File.separator + "pstone";
+    String beanClassPath = "cc" + File.separator + "pstone";
+
+    tg.generateInterfaceControllerCode(13, classPath, beanClassPath, null);
+    tg.generateInterfaceRequestBeanCode(13, beanClassPath, null);
+
+    // PS: 只有第一次生成的时候才能使用
+  }
+
   public void test_code_service_gen() {
     String root = "/Users/mr.j/P_Gateway_DMServer/Branch/StudentApartment/src/main/java";
     TempletGenerate tg = new TempletGenerate(root, root, null);
-    String classPath =
-    "walle" + File.separator +
-    "pstone";
-    String beanClassPath =
-    "walle" + File.separator +
-    "pstone";
+    String classPath = "cc" + File.separator + "pstone";
+    String beanClassPath = "cc" + File.separator + "pstone";
+  }
 
-    tg.generateInterfaceServiceCode(10, null, classPath, beanClassPath, null);
+  // 第三方接口api
+  @Test
+  public void test_code_service_extend_api() {
+    String root = "/Users/mr.j/api/src/main/java";
+    TempletGenerate tg = new TempletGenerate(root, root, null);
+    String classPath = "cc" + File.separator + "pstone";
+    String beanClassPath = "cc" + File.separator + "pstone";
+
+    tg.generateInterfaceControllerCode(14, classPath, beanClassPath, null);
+    tg.generateInterfaceRequestBeanCode(14, beanClassPath, null);
   }
 
 }

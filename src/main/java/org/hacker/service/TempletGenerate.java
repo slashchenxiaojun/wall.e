@@ -371,6 +371,19 @@ public class TempletGenerate {
     System.out.println("############Generate interface controller code success############");
   }
 
+  // 用户编写业务代码的service - 生成所有目录下的service代码 - 用于项目初始化
+  public void generateInterfaceServiceCode(Object projectId, String classPath, String beanClassPath, String templatePath) {
+    Project project = Project.dao.findById(projectId);
+    if ( project == null ) return;
+
+    List<Folder> folderList = Folder.dao.find("SELECT * FROM w_folder WHERE w_project_id = ?", projectId);
+    if ( folderList == null ) return;
+
+    for ( Folder folder : folderList ) {
+      generateInterfaceServiceCode(projectId, folder.getId(), classPath, beanClassPath, templatePath);
+    }
+  }
+
   /**
    * 用户编写业务代码的service，为了防止生成controller和bean代码不被覆盖
    * 这个方法在被调用时，需要做一次密码身份认证，以免菜鸟勿用
@@ -474,8 +487,7 @@ public class TempletGenerate {
       for ( Parameter parameter : parameterList ) {
         if ( parameter.getType().equals("enum") && StrKit.notBlank(parameter.getEnumValue()) ) {
           String enumClassName = StrKit.firstCharToUpperCase(parameter.getName());
-          String[] enumValues = parameter.getEnumValue().split(",");
-          // 这里可以优化一下去掉前后的空格
+          String[] enumValues = parameter.getEnumValue().trim().replaceAll("\\s+", "").split(",");
           Template enum_temp = gt.getTemplate(MAVEN_BASE + "gen/pojo/4beanEnum.btl");
           enum_temp.binding("classPath", classPath.replaceAll(Matcher.quoteReplacement(File.separator), "."));
           enum_temp.binding("moduleName", moduleName);
@@ -547,8 +559,7 @@ public class TempletGenerate {
           for ( Parameter parameter : parameterList ) {
             if ( parameter.getType().equals("enum") && StrKit.notBlank(parameter.getEnumValue()) ) {
               String enumClassName = StrKit.firstCharToUpperCase(parameter.getName());
-              String[] enumValues = parameter.getEnumValue().split(",");
-              // 这里可以优化一下去掉前后的空格
+              String[] enumValues = parameter.getEnumValue().trim().replaceAll("\\s+", "").split(",");
               Template enum_temp = gt.getTemplate(MAVEN_BASE + "gen/pojo/4beanEnum.btl");
               enum_temp.binding("classPath", classPath.replaceAll(Matcher.quoteReplacement(File.separator), "."));
               enum_temp.binding("moduleName", moduleName);
